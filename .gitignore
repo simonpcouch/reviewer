@@ -1,0 +1,11 @@
+.Rproj.user
+plans/
+
+# Downloaded R examples (keep manifest for tracking)
+inst/examples/*.R
+!inst/examples/MANIFEST.json
+.Rhistory
+.RData
+.httr-oauth
+.DS_Store
+.quarto

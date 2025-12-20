@@ -1,0 +1,124 @@
+#' Comment Pane Module UI
+#'
+#' @param id Module ID
+#' @return Shiny UI element
+comment_mod_ui <- function(id) {
+  ns <- shiny::NS(id)
+
+  htmltools::tagList(
+    htmltools::tags$div(
+      class = "comment-pane",
+      shiny::uiOutput(ns("comment_content"))
+    )
+  )
+}
+
+#' Comment Pane Module Server
+#'
+#' @param id Module ID
+#' @param pending_edit Reactive value containing pending edit info or NULL
+#' @param reviewing_started Reactive value indicating if review has started
+#' @return List of module functions
+comment_mod_server <- function(
+  id,
+  pending_edit,
+  reviewing_started
+) {
+ shiny::moduleServer(id, function(input, output, session) {
+    # Signal to continue conversation after edit response
+    continue_signal <- shiny::reactiveVal(NULL)
+
+    output$comment_content <- shiny::renderUI({
+      edit <- pending_edit()
+      started <- reviewing_started()
+
+      if (!started) {
+        return(htmltools::tags$div(
+          class = "reviewing-spinner",
+          htmltools::tags$div(
+            class = "spinner-content",
+            htmltools::tags$div(class = "spinner-border spinner-border-sm text-secondary"),
+            htmltools::tags$span(class = "spinner-text", "Preparing review...")
+          )
+        ))
+      }
+
+      if (is.null(edit)) {
+        return(htmltools::tags$div(
+          class = "reviewing-spinner",
+          htmltools::tags$div(
+            class = "spinner-content",
+            htmltools::tags$div(class = "spinner-border spinner-border-sm text-secondary"),
+            htmltools::tags$span(class = "spinner-text", "Reviewing...")
+          )
+        ))
+      }
+
+      # Show the comment card for the pending edit
+      comment_card(
+        proposal_id = edit$request_id,
+        intent = edit$intent,
+        justification = edit$justification
+      )
+    })
+
+    # Return module interface
+    list(
+      continue_signal = shiny::reactive(continue_signal())
+    )
+  })
+}
+
+#' Create a comment card UI element
+#'
+#' @param proposal_id Unique ID for this proposal
+#' @param intent Short description of the change
+#' @param justification Detailed justification for the change
+#' @return Shiny tag
+comment_card <- function(proposal_id, intent, justification) {
+  htmltools::tags$div(
+    class = "comment-card",
+    `data-proposal-id` = proposal_id,
+
+    # Header row with author and action buttons
+    htmltools::tags$div(
+      class = "comment-header",
+      htmltools::tags$span(class = "comment-author", "Tidy Reviewer"),
+      htmltools::tags$span(
+        class = "comment-actions",
+        htmltools::tags$button(
+          class = "btn-accept",
+          title = "Accept",
+          htmltools::tags$i(class = "bi bi-check-lg")
+        ),
+        htmltools::tags$button(
+          class = "btn-reject",
+          title = "Reject",
+          htmltools::tags$i(class = "bi bi-x-lg")
+        )
+      )
+    ),
+
+    # Timestamp
+    htmltools::tags$div(
+      class = "comment-time",
+      format(Sys.time(), "%I:%M %p Today")
+    ),
+
+    # Intent as the main content (like Google Docs suggestion description)
+    htmltools::tags$div(
+      class = "comment-body",
+      justification
+    ),
+
+    # Feedback input
+    htmltools::tags$div(
+      class = "comment-feedback",
+      htmltools::tags$input(
+        type = "text",
+        class = "form-control",
+        placeholder = "Reply or add feedback..."
+      )
+    )
+  )
+}

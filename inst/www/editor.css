@@ -1,0 +1,105 @@
+/* Editor wrapper */
+.editor-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Editor container */
+.editor-container {
+  font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-y: auto;
+  background: #fafafa;
+  flex: 1;
+  padding: 12px 0;
+}
+
+/* Individual line */
+.editor-line {
+  display: flex;
+  padding: 0 16px;
+  min-height: 21px;
+  transition: opacity 0.3s ease, background-color 0.2s ease;
+}
+
+/* Line number */
+.line-number {
+  color: #999;
+  user-select: none;
+  padding-right: 16px;
+  text-align: right;
+  min-width: 48px;
+  flex-shrink: 0;
+}
+
+/* Line content */
+.line-content {
+  flex: 1;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Editable region styling */
+.editor-line.in-region {
+  opacity: 1;
+  background: transparent;
+  border-left: 3px solid #0d6efd;
+  margin-left: -3px;
+  padding-left: 19px;
+}
+
+/* Dimmed lines outside region */
+.editor-line.dimmed {
+  opacity: 0.5;
+}
+
+/* Diff styling - removed lines */
+.editor-line.diff-removed {
+  background: #ffebe9;
+  opacity: 1;
+}
+
+.editor-line.diff-removed .line-content {
+  text-decoration: line-through;
+  color: #cf222e;
+}
+
+/* Diff styling - added lines */
+.editor-line.diff-added {
+  background: #dafbe1;
+  opacity: 1;
+  border-left: 3px solid #1a7f37;
+  margin-left: -3px;
+  padding-left: 19px;
+}
+
+.editor-line.diff-added .line-content {
+  color: #1a7f37;
+}
+
+.editor-line.diff-added .line-number {
+  color: #1a7f37;
+}
+
+/* Diff marker for added lines */
+.diff-marker {
+  color: #1a7f37;
+  font-weight: bold;
+}
+
+/* Empty state */
+.editor-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Context lines in diff */
+.editor-line.diff-context {
+  background: #f6f8fa;
+}
