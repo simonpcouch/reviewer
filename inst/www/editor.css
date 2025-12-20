@@ -3,6 +3,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: #ffffff;
+  padding: 12px;
 }
 
 /* Editor container */
@@ -11,27 +13,37 @@
   font-size: 13px;
   line-height: 1.6;
   overflow-y: auto;
-  background: #fafafa;
+  background: #ffffff;
   flex: 1;
-  padding: 12px 0;
+  padding: 14px 0;
+  border: 1px solid #e7ecf3;
+  border-radius: 12px;
+  box-shadow:
+    0 12px 34px -22px rgba(37, 99, 235, 0.18),
+    0 10px 22px -18px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(231, 236, 243, 0.8);
 }
 
 /* Individual line */
 .editor-line {
+  position: relative;
   display: flex;
-  padding: 0 16px;
+  padding: 0 18px;
   min-height: 21px;
-  transition: opacity 0.3s ease, background-color 0.2s ease;
+  transition:
+    opacity 0.3s ease,
+    background-color 0.3s ease,
+    filter 0.3s ease;
+}
+
+.editor-line:not(.diff-added):not(.diff-removed):not(.in-region):hover {
+  background-color: #f4f8ff;
+  opacity: 1;
 }
 
 /* Line number */
 .line-number {
-  color: #999;
-  user-select: none;
-  padding-right: 16px;
-  text-align: right;
-  min-width: 48px;
-  flex-shrink: 0;
+  display: none;
 }
 
 /* Line content */
@@ -39,53 +51,70 @@
   flex: 1;
   white-space: pre;
   overflow-x: auto;
+  color: #0f172a;
+}
+
+.editor-line.in-region .line-content {
+  color: #050c19;
+  font-weight: 600;
+}
+
+.line-content.hljs {
+  background: transparent;
 }
 
 /* Editable region styling */
 .editor-line.in-region {
   opacity: 1;
   background: transparent;
-  border-left: 3px solid #0d6efd;
-  margin-left: -3px;
-  padding-left: 19px;
+  border-left: none;
+  box-shadow: none;
+}
+
+.editor-line.in-region::before {
+  display: none;
 }
 
 /* Dimmed lines outside region */
 .editor-line.dimmed {
-  opacity: 0.5;
+  opacity: 0.68;
+  filter: saturate(0.92);
 }
 
 /* Diff styling - removed lines */
 .editor-line.diff-removed {
-  background: #ffebe9;
+  background: #ffe2de;
   opacity: 1;
+  border-left: 3px solid #ef4444;
+  margin-left: -3px;
+  padding-left: 21px;
 }
 
 .editor-line.diff-removed .line-content {
   text-decoration: line-through;
-  color: #cf222e;
+  color: #b91c1c;
 }
 
 /* Diff styling - added lines */
 .editor-line.diff-added {
-  background: #dafbe1;
+  background: #dcfce7;
   opacity: 1;
-  border-left: 3px solid #1a7f37;
+  border-left: 3px solid #10b981;
   margin-left: -3px;
-  padding-left: 19px;
+  padding-left: 21px;
 }
 
 .editor-line.diff-added .line-content {
-  color: #1a7f37;
+  color: #0f8a45;
 }
 
 .editor-line.diff-added .line-number {
-  color: #1a7f37;
+  color: #0f8a45;
 }
 
 /* Diff marker for added lines */
 .diff-marker {
-  color: #1a7f37;
+  color: #0f8a45;
   font-weight: bold;
 }
 
@@ -101,5 +130,5 @@
 
 /* Context lines in diff */
 .editor-line.diff-context {
-  background: #f6f8fa;
+  background: #f5f7fb;
 }

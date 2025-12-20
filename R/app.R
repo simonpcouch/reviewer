@@ -33,16 +33,23 @@ review <- function(
     bslib::page_fillable(
       theme = bslib::bs_theme(version = 5),
       htmltools::tags$head(
-        htmltools::tags$link(
-          rel = "stylesheet",
-          href = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-        ),
-        htmltools::tags$link(rel = "stylesheet", href = "reviewer/editor.css"),
-        htmltools::tags$link(rel = "stylesheet", href = "reviewer/reviewer.css"),
-        # jQuery is included by shiny/bslib already, so scripts load after
-        htmltools::tags$script(src = "reviewer/editor.js"),
-        htmltools::tags$script(src = "reviewer/reviewer.js")
+      htmltools::tags$link(
+        rel = "stylesheet",
+        href = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
       ),
+      htmltools::tags$link(
+        rel = "stylesheet",
+        href = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
+      ),
+      htmltools::tags$link(rel = "stylesheet", href = "reviewer/editor.css"),
+      htmltools::tags$link(rel = "stylesheet", href = "reviewer/reviewer.css"),
+      htmltools::tags$script(
+        src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+      ),
+      # jQuery is included by shiny/bslib already, so scripts load after
+      htmltools::tags$script(src = "reviewer/editor.js"),
+      htmltools::tags$script(src = "reviewer/reviewer.js")
+    ),
 
       bslib::layout_columns(
         col_widths = c(8, 4),

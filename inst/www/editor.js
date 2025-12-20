@@ -1,6 +1,11 @@
 // Editor JavaScript functionality
 
 $(document).ready(function() {
+  // Configure highlight.js for R syntax
+  if (window.hljs) {
+    hljs.configure({ languages: ['r'] });
+  }
+
   // Scroll to a specific line in the editor
   function scrollToLine(lineNum) {
     const line = $(`.editor-line[data-line="${lineNum}"]`);
@@ -24,7 +29,6 @@ $(document).ready(function() {
       const containerTop = container.scrollTop();
       const containerHeight = container.height();
       const lineTop = regionLine.position().top + containerTop;
-      const lineHeight = regionLine.outerHeight();
 
       // Scroll to put region in upper third
       const targetScroll = lineTop - (containerHeight / 3);
@@ -34,18 +38,54 @@ $(document).ready(function() {
     }
   }
 
+  // Apply syntax highlighting to each line
+  function highlightLines() {
+    if (!window.hljs) return;
+
+    $('.line-content').each(function() {
+      const $line = $(this);
+      $line.addClass('hljs');
+      const existingRaw = $line.data('raw');
+      const rawText = existingRaw !== undefined ? existingRaw : $line.text();
+
+      // Preserve blank lines without injecting markup
+      if (!rawText.trim()) {
+        $line.data('raw', rawText);
+        $line.text(rawText);
+        return;
+      }
+
+      let result;
+      try {
+        result = hljs.highlight(rawText, { language: 'r', ignoreIllegals: true });
+      } catch (e) {
+        result = hljs.highlightAuto(rawText);
+      }
+
+      $line.data('raw', rawText);
+      $line.html((result && result.value) ? result.value : rawText);
+    });
+  }
+
+  function enhanceEditor() {
+    setTimeout(function() {
+      highlightLines();
+      scrollToRegion();
+    }, 120);
+  }
+
   // Handle scroll-to-line custom message
   Shiny.addCustomMessageHandler('scroll-to-line', function(data) {
     scrollToLine(data.line);
   });
 
-  // Scroll to region when the editor updates
+  // Enhance when the editor updates
   $(document).on('shiny:value', function(event) {
     if (event.name && event.name.includes('file_editor')) {
-      setTimeout(scrollToRegion, 100);
+      enhanceEditor();
     }
   });
 
-  // Initial scroll on page load
-  setTimeout(scrollToRegion, 500);
+  // Initial enhancement on page load
+  setTimeout(enhanceEditor, 500);
 });
