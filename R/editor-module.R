@@ -16,6 +16,63 @@ editor_mod_ui <- function(id) {
   )
 }
 
+render_inline_diff <- function(old_line, new_line) {
+  old_chars <- strsplit(old_line, "")[[1]]
+  new_chars <- strsplit(new_line, "")[[1]]
+
+  if (length(old_chars) == 0) old_chars <- character(0)
+  if (length(new_chars) == 0) new_chars <- character(0)
+
+  prefix_len <- 0
+
+  min_len <- min(length(old_chars), length(new_chars))
+  while (prefix_len < min_len && old_chars[prefix_len + 1] == new_chars[prefix_len + 1]) {
+    prefix_len <- prefix_len + 1
+  }
+
+  suffix_len <- 0
+  while (suffix_len < (min_len - prefix_len) &&
+         old_chars[length(old_chars) - suffix_len] == new_chars[length(new_chars) - suffix_len]) {
+    suffix_len <- suffix_len + 1
+  }
+
+  prefix <- if (prefix_len > 0) paste(old_chars[1:prefix_len], collapse = "") else ""
+  suffix <- if (suffix_len > 0) paste(old_chars[(length(old_chars) - suffix_len + 1):length(old_chars)], collapse = "") else ""
+
+  old_middle_end <- length(old_chars) - suffix_len
+  old_middle <- if (old_middle_end >= prefix_len + 1) {
+    paste(old_chars[(prefix_len + 1):old_middle_end], collapse = "")
+  } else ""
+
+  new_middle_end <- length(new_chars) - suffix_len
+  new_middle <- if (new_middle_end >= prefix_len + 1) {
+    paste(new_chars[(prefix_len + 1):new_middle_end], collapse = "")
+  } else ""
+
+  html_parts <- htmltools::htmlEscape(prefix)
+
+  if (nchar(old_middle) > 0) {
+    html_parts <- paste0(
+      html_parts,
+      '<span class="diff-inline-removed">',
+      htmltools::htmlEscape(old_middle),
+      '</span>'
+    )
+  }
+  if (nchar(new_middle) > 0) {
+    html_parts <- paste0(
+      html_parts,
+      '<span class="diff-inline-added">',
+      htmltools::htmlEscape(new_middle),
+      '</span>'
+    )
+  }
+
+  html_parts <- paste0(html_parts, htmltools::htmlEscape(suffix))
+
+  html_parts
+}
+
 #' Editor Module Server
 #'
 #' @param id Module ID
@@ -49,23 +106,15 @@ editor_mod_server <- function(
       for (review in edits) {
         edit_info <- review$edit_info
 
-        diff_info <- calculate_diff_info(
-          lines,
-          edit_info$old_str,
-          edit_info$new_str,
-          edit_info$insert_line,
-          edit_info$str_replace_mode
-        )
-
-        if (!is.null(diff_info$diff_lines)) {
-          for (line_num in names(diff_info$diff_lines)) {
-            all_diff_lines[[line_num]] <- diff_info$diff_lines[[line_num]]
+        if (!is.null(edit_info$diff_lines)) {
+          for (line_num in names(edit_info$diff_lines)) {
+            all_diff_lines[[line_num]] <- edit_info$diff_lines[[line_num]]
           }
         }
-        if (!is.null(diff_info$added_lines) && !is.null(diff_info$insert_after_line)) {
+        if (!is.null(edit_info$added_lines_display) && !is.null(edit_info$insert_after_line)) {
           all_additions[[length(all_additions) + 1]] <- list(
-            insert_after = diff_info$insert_after_line,
-            lines = diff_info$added_lines,
+            insert_after = edit_info$insert_after_line,
+            lines = edit_info$added_lines_display,
             request_id = edit_info$request_id
           )
         }
@@ -78,18 +127,31 @@ editor_mod_server <- function(
           if (in_region) "in-region" else "dimmed"
         )
 
-        line_classes <- classes
         diff_info <- all_diff_lines[[as.character(i)]]
-        if (!is.null(diff_info)) {
-          line_classes <- c(line_classes, paste0("diff-", diff_info$type))
-        }
 
-        htmltools::tags$div(
-          class = paste(line_classes, collapse = " "),
-          `data-line` = i,
-          htmltools::tags$span(class = "line-number", i),
-          htmltools::tags$span(class = "line-content", lines[i])
-        )
+        if (!is.null(diff_info) && diff_info$type == "changed") {
+          line_content <- render_inline_diff(
+            diff_info$old_content,
+            diff_info$new_content
+          )
+          htmltools::tags$div(
+            class = paste(c(classes, "diff-changed"), collapse = " "),
+            `data-line` = i,
+            htmltools::tags$span(class = "line-number", i),
+            htmltools::tags$span(class = "line-content", htmltools::HTML(line_content))
+          )
+        } else {
+          line_classes <- classes
+          if (!is.null(diff_info)) {
+            line_classes <- c(line_classes, paste0("diff-", diff_info$type))
+          }
+          htmltools::tags$div(
+            class = paste(line_classes, collapse = " "),
+            `data-line` = i,
+            htmltools::tags$span(class = "line-number", i),
+            htmltools::tags$span(class = "line-content", lines[i])
+          )
+        }
       })
 
       if (length(all_additions) > 0) {

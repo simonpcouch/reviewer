@@ -132,3 +132,25 @@
 .editor-line.diff-context {
   background: #f5f7fb;
 }
+
+/* Diff styling - changed lines (inline diff) */
+.editor-line.diff-changed {
+  opacity: 1;
+}
+
+/* Inline diff - removed text */
+.diff-inline-removed {
+  background: #fecaca;
+  color: #b91c1c;
+  text-decoration: line-through;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Inline diff - added text */
+.diff-inline-added {
+  background: #bbf7d0;
+  color: #0f8a45;
+  border-radius: 2px;
+  padding: 0 2px;
+}

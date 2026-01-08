@@ -44,6 +44,15 @@ $(document).ready(function() {
 
     $('.line-content').each(function() {
       const $line = $(this);
+      const $parent = $line.closest('.editor-line');
+
+      // Skip diff lines - they have special markup we don't want to destroy
+      if ($parent.hasClass('diff-changed') ||
+          $parent.hasClass('diff-removed') ||
+          $parent.hasClass('diff-added')) {
+        return;
+      }
+
       $line.addClass('hljs');
       const existingRaw = $line.data('raw');
       const rawText = existingRaw !== undefined ? existingRaw : $line.text();
