@@ -30,3 +30,6 @@ The following are NOT appropriate things to suggest:
 The following are indeed appropriate suggestions:
 
 * Redundant namespacing, e.g. if the user calls `library(pkg)` somewhere and then, later on, `pkg::`, they can remove `pkg::`.
+* `seq_len()` in favor of `1:n` in control flow.
+* Redundant package loading, e.g. `library(tidyverse)` and `library(dplyr)` in the same script.
+* Simplifying control flow with early returns.
