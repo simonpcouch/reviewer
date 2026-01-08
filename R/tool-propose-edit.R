@@ -17,9 +17,6 @@ tool_propose_edit <- function() {
       "Use old_str + new_str for replacements, or insert_line + new_str for insertions."
     ),
     arguments = list(
-      path = ellmer::type_string(
-        "Path to the file being edited (should match the file being reviewed)"
-      ),
       insert_line = ellmer::type_number(
         "For INSERT mode: Line number after which to insert new_str (0 = beginning of file)",
         required = FALSE
@@ -51,7 +48,6 @@ tool_propose_edit <- function() {
 #' @keywords internal
 make_propose_edit_impl <- function() {
   coro::async(function(
-    path,
     insert_line = NULL,
     new_str = NULL,
     old_str = NULL,
