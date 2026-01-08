@@ -238,7 +238,33 @@ review <- function(
   }
 
 
-  shiny::runApp(shiny::shinyApp(ui, server), launch.browser = TRUE)
+  launch_browser <- getOption("reviewer.launch.browser")
+  if (!is.function(launch_browser)) {
+    # Force an external browser even when the IDE overrides options(browser)
+    launch_browser <- function(url) {
+      browser <- getOption("reviewer.browser")
+      if (is.function(browser)) {
+        browser(url)
+        return(invisible())
+      }
+
+      if (is.null(browser) || !nzchar(browser)) {
+        browser <- if (.Platform$OS.type == "windows") {
+          "cmd /c start"
+        } else if (nzchar(Sys.which("open"))) {
+          "open"
+        } else if (nzchar(Sys.which("xdg-open"))) {
+          "xdg-open"
+        } else {
+          getOption("browser")
+        }
+      }
+
+      utils::browseURL(url, browser = browser)
+    }
+  }
+
+  shiny::runApp(shiny::shinyApp(ui, server), launch.browser = launch_browser)
 }
 
 #' Format file content for the LLM with editable region markers
