@@ -65,22 +65,18 @@ make_propose_edit_impl <- function() {
       cli::cli_abort("propose_edit requires a Shiny session")
     }
 
-    # Validate shift
     if (is.null(shift)) shift <- 0
 
-    # Get current state from session
     file_content <- session$userData$file_content
     editable_region <- session$userData$editable_region
-    pending_edit <- session$userData$pending_edit
+    pending_edits <- session$userData$pending_edits
     file_path <- session$userData$file_path
 
     current_lines <- shiny::isolate(file_content())
     current_region <- shiny::isolate(editable_region())
 
-    # If no new_str, this is a shift-only operation
     if (is.null(new_str)) {
       if (shift > 0) {
-        # Update editable region
         new_start <- min(current_region$start + shift, length(current_lines))
         new_end <- min(current_region$end + shift, length(current_lines))
         editable_region(list(start = new_start, end = new_end))
@@ -101,7 +97,6 @@ make_propose_edit_impl <- function() {
       }
     }
 
-    # Validate edit mode
     str_replace_mode <- !is.null(old_str) && !is.null(new_str)
     insert_mode <- !is.null(insert_line) && !is.null(new_str)
 
@@ -119,7 +114,6 @@ make_propose_edit_impl <- function() {
       ))
     }
 
-    # Validate str_replace mode
     if (str_replace_mode) {
       old_content_text <- paste(current_lines, collapse = "\n")
       matches <- gregexpr(old_str, old_content_text, fixed = TRUE)[[1]]
@@ -145,7 +139,6 @@ make_propose_edit_impl <- function() {
       }
     }
 
-    # Validate insert mode
     if (insert_mode) {
       if (insert_line < 0 || insert_line > length(current_lines)) {
         return(ellmer::ContentToolResult(
@@ -158,7 +151,6 @@ make_propose_edit_impl <- function() {
       }
     }
 
-    # Calculate diff information for display
     diff_info <- calculate_diff_info(
       current_lines,
       old_str,
@@ -167,10 +159,8 @@ make_propose_edit_impl <- function() {
       str_replace_mode
     )
 
-    # Create unique request ID
     request_id <- uuid::UUIDgenerate()
 
-    # Set up the pending edit display
     edit_info <- list(
       request_id = request_id,
       intent = `_intent` %||% "Edit",
@@ -179,77 +169,37 @@ make_propose_edit_impl <- function() {
       new_str = new_str,
       insert_line = insert_line,
       shift = shift,
+      str_replace_mode = str_replace_mode,
       diff_lines = diff_info$diff_lines,
       added_lines_display = diff_info$added_lines,
       insert_after_line = diff_info$insert_after_line
     )
 
-    pending_edit(edit_info)
+    the$reviews[[request_id]] <- list(
+      request_id = request_id,
+      status = "pending",
+      edit_info = edit_info,
+      response = NULL,
+      seen_by_model = FALSE,
+      created_at = Sys.time()
+    )
 
-    # Create promise that waits for user response
-    approval_promise <- promises::promise(function(resolve, reject) {
-      session$userData$edit_resolvers$set(request_id, resolve)
-    })
+    pending_edits(sort_reviews_by_position(the$reviews[pending_reviews()], current_lines))
 
-    # Timeout after 5 minutes
-    timeout_promise <- promises::promise(function(resolve, reject) {
-      later::later(function() {
-        resolve(list(approved = FALSE, feedback = "Timeout: No response from user."))
-      }, delay = 300)
-    })
-
-    # Wait for response
-    response <- coro::await(promises::promise_race(
-      approval_promise,
-      timeout_promise
-    ))
-
-    # Clean up
-    session$userData$edit_resolvers$remove(request_id)
-    pending_edit(NULL)
-
-    # Handle response
-    if (isTRUE(response$approved)) {
-      # Apply the edit
-      new_lines <- apply_edit_to_lines(
-        current_lines,
-        old_str,
-        new_str,
-        insert_line,
-        str_replace_mode
-      )
-
-      file_content(new_lines)
-
-      # Write to file
-      writeLines(new_lines, file_path)
-
-      # Update editable region with shift
-      if (shift > 0) {
-        new_start <- min(current_region$start + shift, length(new_lines))
-        new_end <- min(current_region$end + shift, length(new_lines))
-        editable_region(list(start = new_start, end = new_end))
-      }
-
-      return(ellmer::ContentToolResult(
-        value = "Edit accepted and applied.",
-        extra = list(
-          display = list(
-            markdown = "Edit accepted.",
-            title = "Edit Applied",
-            show_request = FALSE
-          )
-        )
-      ))
-    } else if (!is.null(response$feedback) && nzchar(response$feedback)) {
-      return(ellmer::ContentToolResult(
-        value = sprintf("User provided feedback: %s", response$feedback)
-      ))
-    } else {
-      return(ellmer::ContentToolResult(
-        value = "Edit rejected by user. Consider a different approach or move on."
-      ))
+    n_pending <- length(pending_reviews())
+    if (n_pending > 3) {
+      throttle_promise <- promises::promise(function(resolve, reject) {
+        session$userData$throttle_resolver <- resolve
+      })
+      coro::await(throttle_promise)
     }
+
+    return(ellmer::ContentToolResult(
+      value = "Review item submitted.",
+      extra = list(
+        display = list(show_request = FALSE)
+      )
+    ))
   })
 }
 

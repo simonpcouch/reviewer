@@ -16,20 +16,17 @@ comment_mod_ui <- function(id) {
 #' Comment Pane Module Server
 #'
 #' @param id Module ID
-#' @param pending_edit Reactive value containing pending edit info or NULL
+#' @param pending_edits Reactive value containing list of pending edits
 #' @param reviewing_started Reactive value indicating if review has started
 #' @return List of module functions
 comment_mod_server <- function(
   id,
-  pending_edit,
+  pending_edits,
   reviewing_started
 ) {
- shiny::moduleServer(id, function(input, output, session) {
-    # Signal to continue conversation after edit response
-    continue_signal <- shiny::reactiveVal(NULL)
-
+  shiny::moduleServer(id, function(input, output, session) {
     output$comment_content <- shiny::renderUI({
-      edit <- pending_edit()
+      edits <- pending_edits()
       started <- reviewing_started()
 
       if (!started) {
@@ -43,7 +40,7 @@ comment_mod_server <- function(
         ))
       }
 
-      if (is.null(edit)) {
+      if (length(edits) == 0) {
         return(htmltools::tags$div(
           class = "reviewing-spinner",
           htmltools::tags$div(
@@ -54,18 +51,19 @@ comment_mod_server <- function(
         ))
       }
 
-      # Show the comment card for the pending edit
-      comment_card(
-        proposal_id = edit$request_id,
-        intent = edit$intent,
-        justification = edit$justification
-      )
+      cards <- lapply(edits, function(review) {
+        edit_info <- review$edit_info
+        comment_card(
+          proposal_id = edit_info$request_id,
+          intent = edit_info$intent,
+          justification = edit_info$justification
+        )
+      })
+
+      htmltools::tagList(cards)
     })
 
-    # Return module interface
-    list(
-      continue_signal = shiny::reactive(continue_signal())
-    )
+    list()
   })
 }
 

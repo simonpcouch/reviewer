@@ -24,11 +24,6 @@ review <- function(
   )
 
 
-  # Create chat client with echo to see what's happening
-
-  client <- ellmer::chat(model, system_prompt = system_prompt, echo = "output")
-  client$register_tool(tool_propose_edit())
-
   ui <- function(req) {
     bslib::page_fillable(
       theme = bslib::bs_theme(version = 5),
@@ -62,66 +57,143 @@ review <- function(
         comment_mod_ui("comments")
       ),
 
-      # Close button
       htmltools::tags$button(
         id = "close_btn",
         class = "btn-close",
         style = "position: fixed; top: 12px; right: 12px; z-index: 1000;",
-        `aria-label` = "Close"
+        `aria-label` = "Close",
+        onclick = "Shiny.setInputValue('close_btn', Math.random(), {priority: 'event'})"
       )
     )
   }
 
   server <- function(input, output, session) {
-    # Add resource path for www assets
     shiny::addResourcePath("reviewer", system.file("www", package = "reviewer"))
 
-    # Initialize resolver storage for edit approvals
-    session$userData$edit_resolvers <- fastmap::fastmap()
+    client <- ellmer::chat(model, system_prompt = system_prompt, echo = "output")
+    client$register_tool(tool_propose_edit())
 
-    # Reactive values for shared state
+    reset_reviews()
+
     editable_region <- shiny::reactiveVal(list(start = 1, end = 15))
     file_content <- shiny::reactiveVal(file_lines)
-    pending_edit <- shiny::reactiveVal(NULL)
+    pending_edits <- shiny::reactiveVal(list())
     reviewing_started <- shiny::reactiveVal(FALSE)
 
-    # Store state in session for tool access
     session$userData$editable_region <- editable_region
     session$userData$file_content <- file_content
-    session$userData$pending_edit <- pending_edit
+    session$userData$pending_edits <- pending_edits
     session$userData$file_path <- file_path
 
-    # Initialize modules
     editor <- editor_mod_server(
       "editor",
       file_content = file_content,
       editable_region = editable_region,
-      pending_edit = pending_edit
+      pending_edits = pending_edits
     )
 
     comments <- comment_mod_server(
       "comments",
-      pending_edit = pending_edit,
+      pending_edits = pending_edits,
       reviewing_started = reviewing_started
     )
 
-    # Handle approval responses from JS
+    format_review_responses <- function() {
+      unseen_ids <- unseen_resolved_reviews()
+      if (length(unseen_ids) == 0) return("")
+
+      parts <- character()
+      for (id in unseen_ids) {
+        review <- the$reviews[[id]]
+        response <- review$response
+        intent <- review$edit_info$intent
+
+        if (isTRUE(response$approved)) {
+          parts <- c(parts, sprintf("Edit '%s': Accepted and applied.", intent))
+        } else if (!is.null(response$feedback) && nzchar(response$feedback)) {
+          parts <- c(parts, sprintf("Edit '%s': User feedback: %s", intent, response$feedback))
+        } else {
+          parts <- c(parts, sprintf("Edit '%s': Rejected by user.", intent))
+        }
+
+        the$reviews[[id]]$seen_by_model <- TRUE
+      }
+
+      paste(parts, collapse = "\n")
+    }
+
+    feedback_pending <- shiny::reactiveVal(FALSE)
+
+    start_feedback_turn <- function() {
+      feedback <- format_review_responses()
+      if (nzchar(feedback)) {
+        current_lines <- shiny::isolate(file_content())
+        current_region <- shiny::isolate(editable_region())
+
+        file_context <- format_file_for_llm(
+          current_lines,
+          editable_start = current_region$start,
+          editable_end = current_region$end
+        )
+
+        message <- paste0(
+          "User responded to review items:\n\n",
+          feedback,
+          "\n\nCurrent file state:\n\n",
+          file_context
+        )
+        stream_task$invoke(client, message)
+      }
+    }
+
     shiny::observeEvent(input$edit_response, {
       response <- input$edit_response
-      resolver <- session$userData$edit_resolvers$get(response$request_id)
-      if (!is.null(resolver)) {
-        resolver(response)
-        session$userData$edit_resolvers$remove(response$request_id)
+      request_id <- response$request_id
+
+      if (is.null(the$reviews[[request_id]])) return()
+
+      the$reviews[[request_id]]$status <- "resolved"
+      the$reviews[[request_id]]$response <- response
+
+      if (isTRUE(response$approved)) {
+        review <- the$reviews[[request_id]]
+        edit_info <- review$edit_info
+
+        current_lines <- shiny::isolate(file_content())
+        new_lines <- apply_edit_to_lines(
+          current_lines,
+          edit_info$old_str,
+          edit_info$new_str,
+          edit_info$insert_line,
+          edit_info$str_replace_mode
+        )
+        file_content(new_lines)
+        writeLines(new_lines, file_path)
+
+        if (!is.null(edit_info$shift) && edit_info$shift > 0) {
+          current_region <- shiny::isolate(editable_region())
+          new_start <- min(current_region$start + edit_info$shift, length(new_lines))
+          new_end <- min(current_region$end + edit_info$shift, length(new_lines))
+          editable_region(list(start = new_start, end = new_end))
+        }
       }
+
+      current_lines <- shiny::isolate(file_content())
+      pending_edits(sort_reviews_by_position(the$reviews[pending_reviews()], current_lines))
+
+      if (!is.null(session$userData$throttle_resolver)) {
+        session$userData$throttle_resolver(TRUE)
+        session$userData$throttle_resolver <- NULL
+      }
+
+      feedback_pending(TRUE)
     })
 
-    # Create the streaming task
     stream_task <- shiny::ExtendedTask$new(
       function(client, message) {
         stream <- client$stream_async(message, stream = "content")
         promises::promise_resolve(stream) |>
           promises::then(function(stream) {
-            # Consume the stream (tool calls are handled by callbacks)
             coro::async(function() {
               for (msg in stream) {
                 if (promises::is.promising(msg)) {
@@ -134,7 +206,13 @@ review <- function(
       }
     )
 
-    # Start the review on app load (once only)
+    shiny::observeEvent(stream_task$status(), {
+      if (stream_task$status() %in% c("success", "error") && feedback_pending()) {
+        feedback_pending(FALSE)
+        start_feedback_turn()
+      }
+    })
+
     shiny::observeEvent(TRUE, once = TRUE, {
       reviewing_started(TRUE)
 
@@ -160,7 +238,7 @@ review <- function(
   }
 
 
-  shiny::shinyApp(ui, server, options = list(launch.browser = TRUE))
+  shiny::runApp(shiny::shinyApp(ui, server), launch.browser = TRUE)
 }
 
 #' Format file content for the LLM with editable region markers
