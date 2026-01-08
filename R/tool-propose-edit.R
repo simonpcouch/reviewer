@@ -17,6 +17,12 @@ tool_propose_edit <- function() {
       "Use old_str + new_str for replacements, or insert_line + new_str for insertions."
     ),
     arguments = list(
+      `_intent` = ellmer::type_string(
+        "A short description of the change, e.g. 'Adding spaces around equals signs'"
+      ),
+      justification = ellmer::type_string(
+        "Your argument for why this change improves the code (2 sentences max). This is shown to the user."
+      ),
       insert_line = ellmer::type_number(
         "For INSERT mode: Line number after which to insert new_str (0 = beginning of file)",
         required = FALSE
@@ -28,12 +34,6 @@ tool_propose_edit <- function() {
       old_str = ellmer::type_string(
         "For REPLACE mode: The exact text to find and replace. Must match exactly including whitespace.",
         required = FALSE
-      ),
-      `_intent` = ellmer::type_string(
-        "A short description of the change, e.g. 'Adding spaces around equals signs'"
-      ),
-      justification = ellmer::type_string(
-        "Your argument for why this change improves the code (2 sentences max). This is shown to the user."
       ),
       shift = ellmer::type_number(
         "Number of lines to shift the editable region forward after this edit (default 0)",
@@ -48,11 +48,11 @@ tool_propose_edit <- function() {
 #' @keywords internal
 make_propose_edit_impl <- function() {
   coro::async(function(
+    `_intent` = NULL,
+    justification = NULL,
     insert_line = NULL,
     new_str = NULL,
     old_str = NULL,
-    `_intent` = NULL,
-    justification = NULL,
     shift = 0
   ) {
     session <- shiny::getDefaultReactiveDomain()
