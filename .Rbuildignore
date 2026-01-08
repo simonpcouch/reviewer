@@ -6,3 +6,5 @@
 .claude/
 CLAUDE.md
 ^inst/examples$
+inst/reviewer.png
+inst/reviewer-sc.png
