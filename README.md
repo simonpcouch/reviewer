@@ -7,3 +7,44 @@ As if a member of the tidyverse team were there with you to workshop
 your code for reproducibility, readability, and resilience:
 
 <img src="inst/reviewer-sc.png" alt="A code editor containing R code with a panel on the right showing a comment from 'Tidy reviewer'. On the left, the workspace setup section loads various libraries including tidyverse, extraDistr, MASS, cmdstanr, and bayesplot. Three lines (tidyr, purrr, and ggplot2) are highlighted in red, indicating they've been flagged. The 'Tidy Reviewer' panel displays feedback explaining that these three packages are redundant because tidyverse already includes them, suggesting their removal to simplify dependencies." width="100%" />
+
+## Installation
+
+Install reviewer from GitHub with:
+
+``` r
+pak::pak("simonpcouch/reviewer")
+```
+
+## Authentication
+
+You can use any model provider supported by
+[ellmer](https://ellmer.tidyverse.org/).
+
+If you’re connecting to a model provider by API key, add your API key to
+your `.Renviron`.
+
+See the ellmer
+[authentication](https://ellmer.tidyverse.org/#authentication)
+documentation for more details.
+
+## Usage
+
+To review an R script:
+
+``` r
+library(reviewer)
+review("path/to/your/script.R")
+```
+
+This opens a Shiny app where you can accept or reject the suggested
+improvements to your code.
+
+By default, `review()` uses Claude Sonnet 4. To change models, provide a
+`provider/model` string in the same manner you would to
+[`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html)
+to the `model` argument:
+
+``` r
+review("path/to/your/script.R", model = "openai/gpt-5")
+```
