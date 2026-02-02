@@ -1,9 +1,13 @@
 Package: reviewer
-Title: What the Package Does (One Line, Title Case)
+Title: Interactive LLM-Powered Tidy Code Review
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R:
+    person("Simon", "Couch", , "simon.couch@posit.co", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-5676-5107"))
+Description: Provides an interactive Shiny application for reviewing R code with
+    AI assistance. An LLM suggests edits to improve reproducibility, readability,
+    and resilience which you can choose to accept or reject. Changes are applied directly
+    to your file.
 License: MIT + file LICENSE
 Imports:
     bslib,
