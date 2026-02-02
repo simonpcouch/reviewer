@@ -274,6 +274,7 @@ review <- function(
 #' @param editable_end End line of editable region
 #' @param visible_lines Number of lines to show (default 50)
 #' @return Formatted string for LLM consumption
+#' @noRd
 format_file_for_llm <- function(
   lines,
   editable_start,
