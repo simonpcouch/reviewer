@@ -29,3 +29,36 @@ As if a member of the tidyverse team were there with you to workshop your code f
 #|   them, suggesting their removal to simplify dependencies.
 knitr::include_graphics("inst/reviewer-sc.png")
 ```
+
+## Installation
+
+Install reviewer from GitHub with:
+
+```r
+pak::pak("simonpcouch/reviewer")
+```
+
+## Authentication
+
+You can use any model provider supported by [ellmer](https://ellmer.tidyverse.org/). 
+
+If you're connecting to a model provider by API key, add your API key to your `.Renviron`. 
+
+See the ellmer [authentication](https://ellmer.tidyverse.org/#authentication) documentation for more details.
+
+## Usage
+
+To review an R script:
+
+```r
+library(reviewer)
+review("path/to/your/script.R")
+```
+
+This opens a Shiny app where you can accept or reject the suggested improvements to your code.
+
+By default, `review()` uses Claude Sonnet 4. To change models, provide a `provider/model` string in the same manner you would to [`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html) to the `model` argument:
+
+```r
+review("path/to/your/script.R", model = "openai/gpt-5")
+```

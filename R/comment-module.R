@@ -2,6 +2,7 @@
 #'
 #' @param id Module ID
 #' @return Shiny UI element
+#' @noRd
 comment_mod_ui <- function(id) {
   ns <- shiny::NS(id)
 
@@ -19,6 +20,7 @@ comment_mod_ui <- function(id) {
 #' @param pending_edits Reactive value containing list of pending edits
 #' @param reviewing_started Reactive value indicating if review has started
 #' @return List of module functions
+#' @noRd
 comment_mod_server <- function(
   id,
   pending_edits,
@@ -73,6 +75,7 @@ comment_mod_server <- function(
 #' @param intent Short description of the change
 #' @param justification Detailed justification for the change
 #' @return Shiny tag
+#' @noRd
 comment_card <- function(proposal_id, intent, justification) {
   htmltools::tags$div(
     class = "comment-card",
