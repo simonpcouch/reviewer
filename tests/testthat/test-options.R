@@ -29,8 +29,7 @@ test_that("new_reviewer_chat() uses model argument when option not set", {
   expect_equal(result$args$system_prompt, "test prompt")
 })
 
-test_that("new_reviewer_chat() uses string option over model argument",
-{
+test_that("new_reviewer_chat() uses string option over model argument", {
   withr::local_options(reviewer.chat = "openai/gpt-5")
   testthat::local_mocked_bindings(
     chat = function(model, ...) {
@@ -67,7 +66,7 @@ test_that("new_reviewer_chat() errors for invalid option type", {
 })
 
 test_that("new_reviewer_chat() errors for non-scalar string option", {
- withr::local_options(reviewer.chat = c("model1", "model2"))
+  withr::local_options(reviewer.chat = c("model1", "model2"))
   expect_snapshot(new_reviewer_chat(NULL, "system prompt"), error = TRUE)
 })
 

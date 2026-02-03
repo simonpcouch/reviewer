@@ -20,15 +20,15 @@ library(jsonlite)
 #'
 #' @return Invisibly returns the manifest data frame
 collect_r_examples <- function(
-    n = 10,
-    output_dir = "inst/examples",
-    manifest_file = file.path(output_dir, "MANIFEST.json"),
-    overwrite = FALSE,
-    search_query = "analysis OR script OR data"
+  n = 10,
+  output_dir = "inst/examples",
+  manifest_file = file.path(output_dir, "MANIFEST.json"),
+  overwrite = FALSE,
+  search_query = "analysis OR script OR data"
 ) {
   # Create output directory if needed
 
-if (!dir.exists(output_dir)) {
+  if (!dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE)
     message("Created directory: ", output_dir)
   }
@@ -38,7 +38,7 @@ if (!dir.exists(output_dir)) {
 
   # Search for R files on GitHub
   message("Searching GitHub for R files...")
-  candidates <- search_r_files(search_query, n_results = n * 5)  # Get extra to filter
+  candidates <- search_r_files(search_query, n_results = n * 5) # Get extra to filter
 
   if (length(candidates) == 0) {
     message("No candidate files found.")
@@ -59,9 +59,14 @@ if (!dir.exists(output_dir)) {
   # Collect files up to n
   collected <- 0
   for (candidate in candidates) {
-    if (collected >= n) break
+    if (collected >= n) {
+      break
+    }
 
-    result <- try(collect_single_file(candidate, output_dir, manifest), silent = TRUE)
+    result <- try(
+      collect_single_file(candidate, output_dir, manifest),
+      silent = TRUE
+    )
 
     if (!inherits(result, "try-error") && !is.null(result)) {
       manifest <- result
@@ -72,7 +77,12 @@ if (!dir.exists(output_dir)) {
 
   # Save manifest
   save_manifest(manifest, manifest_file)
-  message("\nCollected ", collected, " files. Manifest saved to: ", manifest_file)
+  message(
+    "\nCollected ",
+    collected,
+    " files. Manifest saved to: ",
+    manifest_file
+  )
 
   invisible(manifest)
 }
@@ -114,22 +124,36 @@ search_r_files <- function(query, n_results = 50) {
     )
 
     if (inherits(response, "try-error")) {
-      warning("GitHub API error on page ", page, ": ", conditionMessage(attr(response, "condition")))
+      warning(
+        "GitHub API error on page ",
+        page,
+        ": ",
+        conditionMessage(attr(response, "condition"))
+      )
       break
     }
 
-    if (length(response$items) == 0) break
+    if (length(response$items) == 0) {
+      break
+    }
 
     for (item in response$items) {
-      results <- c(results, list(list(
-        name = item$name,
-        path = item$path,
-        repo_full_name = item$repository$full_name,
-        repo_url = item$repository$html_url,
-        file_url = item$html_url,
-        raw_url = gsub("github.com", "raw.githubusercontent.com", item$html_url),
-        sha = item$sha
-      )))
+      results <- c(
+        results,
+        list(list(
+          name = item$name,
+          path = item$path,
+          repo_full_name = item$repository$full_name,
+          repo_url = item$repository$html_url,
+          file_url = item$html_url,
+          raw_url = gsub(
+            "github.com",
+            "raw.githubusercontent.com",
+            item$html_url
+          ),
+          sha = item$sha
+        ))
+      )
     }
 
     page <- page + 1
@@ -162,22 +186,34 @@ filter_candidates <- function(candidates, manifest, overwrite) {
     "NAMESPACE$"
   )
 
- # Filenames to exclude (case-insensitive) - e.g., Shiny app files
+  # Filenames to exclude (case-insensitive) - e.g., Shiny app files
   excluded_names <- c("ui.r", "app.r")
 
   filtered <- list()
 
   for (candidate in candidates) {
     # Skip if path matches package patterns
-    is_pkg <- any(vapply(pkg_patterns, function(p) grepl(p, candidate$path), logical(1)))
-    if (is_pkg) next
+    is_pkg <- any(vapply(
+      pkg_patterns,
+      function(p) grepl(p, candidate$path),
+      logical(1)
+    ))
+    if (is_pkg) {
+      next
+    }
 
     # Skip excluded filenames (case-insensitive)
-    if (tolower(candidate$name) %in% excluded_names) next
+    if (tolower(candidate$name) %in% excluded_names) {
+      next
+    }
 
     # Skip if already in manifest (unless overwrite)
-    if (!overwrite && candidate$sha %in% manifest$sha) next
-    if (!overwrite && candidate$file_url %in% manifest$file_url) next
+    if (!overwrite && candidate$sha %in% manifest$sha) {
+      next
+    }
+    if (!overwrite && candidate$file_url %in% manifest$file_url) {
+      next
+    }
 
     filtered <- c(filtered, list(candidate))
   }
@@ -199,7 +235,9 @@ collect_single_file <- function(candidate, output_dir, manifest) {
 
   # Download file content
   content <- download_file_content(candidate)
-  if (is.null(content)) return(NULL)
+  if (is.null(content)) {
+    return(NULL)
+  }
 
   # Generate unique filename
   safe_repo <- gsub("/", "_", candidate$repo_full_name)

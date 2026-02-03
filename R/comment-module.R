@@ -24,7 +24,9 @@ comment_mod_server <- function(
           class = "reviewing-spinner",
           htmltools::tags$div(
             class = "spinner-content",
-            htmltools::tags$div(class = "spinner-border spinner-border-sm text-secondary"),
+            htmltools::tags$div(
+              class = "spinner-border spinner-border-sm text-secondary"
+            ),
             htmltools::tags$span(class = "spinner-text", "Preparing review...")
           )
         ))
@@ -35,7 +37,9 @@ comment_mod_server <- function(
           class = "reviewing-spinner",
           htmltools::tags$div(
             class = "spinner-content",
-            htmltools::tags$div(class = "spinner-border spinner-border-sm text-secondary"),
+            htmltools::tags$div(
+              class = "spinner-border spinner-border-sm text-secondary"
+            ),
             htmltools::tags$span(class = "spinner-text", "Reviewing...")
           )
         ))

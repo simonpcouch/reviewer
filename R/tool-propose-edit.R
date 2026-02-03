@@ -56,7 +56,9 @@ make_propose_edit_impl <- function(max_pending = NULL) {
       cli::cli_abort("propose_edit requires a Shiny session")
     }
 
-    if (is.null(shift)) shift <- 0
+    if (is.null(shift)) {
+      shift <- 0
+    }
 
     file_content <- session$userData$file_content
     editable_region <- session$userData$editable_region
@@ -75,7 +77,9 @@ make_propose_edit_impl <- function(max_pending = NULL) {
         return(ellmer::ContentToolResult(
           value = sprintf(
             "Shifted editable region by %d lines. New region: lines %d-%d.",
-            shift, new_start, new_end
+            shift,
+            new_start,
+            new_end
           ),
           extra = list(
             display = list(show_request = FALSE)
@@ -197,7 +201,10 @@ make_propose_edit_impl <- function(max_pending = NULL) {
       created_at = Sys.time()
     )
 
-    pending_edits(sort_reviews_by_position(the$reviews[pending_reviews()], current_lines))
+    pending_edits(sort_reviews_by_position(
+      the$reviews[pending_reviews()],
+      current_lines
+    ))
 
     n_pending <- length(pending_reviews())
     if (n_pending >= max_pending) {
@@ -233,18 +240,25 @@ calculate_diff_info <- function(
 
     if (match_pos > 0) {
       chars_before <- substr(old_content_text, 1, match_pos - 1)
-      newlines_before <- lengths(regmatches(chars_before, gregexpr("\n", chars_before)))
+      newlines_before <- lengths(regmatches(
+        chars_before,
+        gregexpr("\n", chars_before)
+      ))
       start_line <- newlines_before + 1
 
       old_str_trimmed <- sub("\n$", "", old_str)
       old_str_lines <- strsplit(old_str_trimmed, "\n", fixed = TRUE)[[1]]
-      if (length(old_str_lines) == 0) old_str_lines <- ""
+      if (length(old_str_lines) == 0) {
+        old_str_lines <- ""
+      }
       n_old_lines <- length(old_str_lines)
       end_line <- start_line + n_old_lines - 1
 
       new_str_trimmed <- sub("\n$", "", new_str)
       new_str_lines <- strsplit(new_str_trimmed, "\n", fixed = TRUE)[[1]]
-      if (length(new_str_lines) == 0) new_str_lines <- ""
+      if (length(new_str_lines) == 0) {
+        new_str_lines <- ""
+      }
 
       diff_result <- match_lines_by_similarity(
         old_str_lines,
@@ -313,7 +327,11 @@ match_lines_by_similarity <- function(old_lines, new_lines, start_line) {
       j <- which(!new_matched & new_lines == old_lines[i])[1]
       old_matched[i] <- TRUE
       new_matched[j] <- TRUE
-      matches[[length(matches) + 1]] <- list(old_idx = i, new_idx = j, sim = 1.0)
+      matches[[length(matches) + 1]] <- list(
+        old_idx = i,
+        new_idx = j,
+        sim = 1.0
+      )
     }
   }
 
@@ -332,7 +350,9 @@ match_lines_by_similarity <- function(old_lines, new_lines, start_line) {
       }
     }
 
-    if (is.na(best_i)) break
+    if (is.na(best_i)) {
+      break
+    }
 
     old_matched[best_i] <- TRUE
     new_matched[best_j] <- TRUE
@@ -365,21 +385,30 @@ match_lines_by_similarity <- function(old_lines, new_lines, start_line) {
 }
 
 line_similarity <- function(a, b) {
-  if (nchar(a) == 0 && nchar(b) == 0) return(1)
-  if (nchar(a) == 0 || nchar(b) == 0) return(0)
+  if (nchar(a) == 0 && nchar(b) == 0) {
+    return(1)
+  }
+  if (nchar(a) == 0 || nchar(b) == 0) {
+    return(0)
+  }
 
   a_chars <- strsplit(a, "")[[1]]
   b_chars <- strsplit(b, "")[[1]]
 
   prefix_len <- 0
   min_len <- min(length(a_chars), length(b_chars))
-  while (prefix_len < min_len && a_chars[prefix_len + 1] == b_chars[prefix_len + 1]) {
+  while (
+    prefix_len < min_len && a_chars[prefix_len + 1] == b_chars[prefix_len + 1]
+  ) {
     prefix_len <- prefix_len + 1
   }
 
   suffix_len <- 0
-  while (suffix_len < (min_len - prefix_len) &&
-         a_chars[length(a_chars) - suffix_len] == b_chars[length(b_chars) - suffix_len]) {
+  while (
+    suffix_len < (min_len - prefix_len) &&
+      a_chars[length(a_chars) - suffix_len] ==
+        b_chars[length(b_chars) - suffix_len]
+  ) {
     suffix_len <- suffix_len + 1
   }
 
@@ -404,7 +433,11 @@ apply_edit_to_lines <- function(
     c(
       if (insert_line > 0) lines[1:insert_line] else character(0),
       new_str_lines,
-      if (insert_line < length(lines)) lines[(insert_line + 1):length(lines)] else character(0)
+      if (insert_line < length(lines)) {
+        lines[(insert_line + 1):length(lines)]
+      } else {
+        character(0)
+      }
     )
   }
 }

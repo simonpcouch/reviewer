@@ -129,7 +129,6 @@ test_that("check_edit_conflicts allows non-overlapping edits", {
     str_replace_mode = TRUE
   )
 
-
   result <- check_edit_conflicts(new_edit, file_lines)
   expect_null(result)
 })

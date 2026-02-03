@@ -6,7 +6,11 @@ get_reviewer_chat <- function() {
   getOption("reviewer.chat")
 }
 
-new_reviewer_chat <- function(model, system_prompt, call = rlang::caller_env()) {
+new_reviewer_chat <- function(
+  model,
+  system_prompt,
+  call = rlang::caller_env()
+) {
   chat_option <- get_reviewer_chat()
 
   if (is.null(chat_option) && is.null(model)) {
@@ -33,7 +37,11 @@ new_reviewer_chat <- function(model, system_prompt, call = rlang::caller_env()) 
   }
 
   if (is.character(chat_option) && length(chat_option) == 1) {
-    return(ellmer::chat(chat_option, system_prompt = system_prompt, echo = "output"))
+    return(ellmer::chat(
+      chat_option,
+      system_prompt = system_prompt,
+      echo = "output"
+    ))
   }
 
   cli::cli_abort(
@@ -60,7 +68,9 @@ get_reviewer_pending_edits <- function(max_pending = NULL) {
     return(3)
   }
 
-  if (is.numeric(option_value) && length(option_value) == 1 && option_value >= 1) {
+  if (
+    is.numeric(option_value) && length(option_value) == 1 && option_value >= 1
+  ) {
     return(as.integer(option_value))
   }
 
@@ -75,12 +85,10 @@ get_reviewer_pending_edits <- function(max_pending = NULL) {
 }
 
 pending_reviews <- function() {
-
   names(Filter(function(r) r$status == "pending", the$reviews))
 }
 
 unseen_resolved_reviews <- function() {
-
   names(Filter(
     function(r) r$status == "resolved" && !r$seen_by_model,
     the$reviews
@@ -88,33 +96,41 @@ unseen_resolved_reviews <- function() {
 }
 
 ordered_reviews <- function() {
-  if (length(the$reviews) == 0) return(character(0))
+  if (length(the$reviews) == 0) {
+    return(character(0))
+  }
 
   created_times <- sapply(the$reviews, function(r) r$created_at)
   names(the$reviews)[order(created_times)]
 }
 
 sort_reviews_by_position <- function(reviews, file_lines) {
-  if (length(reviews) == 0) return(reviews)
+  if (length(reviews) == 0) {
+    return(reviews)
+  }
 
   file_text <- paste(file_lines, collapse = "\n")
 
-  positions <- vapply(reviews, function(review) {
-    edit_info <- review$edit_info
-    if (isTRUE(edit_info$str_replace_mode) && !is.null(edit_info$old_str)) {
-      match_pos <- regexpr(edit_info$old_str, file_text, fixed = TRUE)
-      if (match_pos > 0) {
-        chars_before <- substr(file_text, 1, match_pos - 1)
-        sum(charToRaw(chars_before) == charToRaw("\n")) + 1
+  positions <- vapply(
+    reviews,
+    function(review) {
+      edit_info <- review$edit_info
+      if (isTRUE(edit_info$str_replace_mode) && !is.null(edit_info$old_str)) {
+        match_pos <- regexpr(edit_info$old_str, file_text, fixed = TRUE)
+        if (match_pos > 0) {
+          chars_before <- substr(file_text, 1, match_pos - 1)
+          sum(charToRaw(chars_before) == charToRaw("\n")) + 1
+        } else {
+          Inf
+        }
+      } else if (!is.null(edit_info$insert_line)) {
+        edit_info$insert_line
       } else {
         Inf
       }
-    } else if (!is.null(edit_info$insert_line)) {
-      edit_info$insert_line
-    } else {
-      Inf
-    }
-  }, numeric(1))
+    },
+    numeric(1)
+  )
 
   reviews[order(positions)]
 }
@@ -143,7 +159,6 @@ check_edit_conflicts <- function(new_edit_info, file_lines) {
   pending_ids <- pending_reviews()
   if (length(pending_ids) == 0) {
     return(NULL)
-
   }
 
   file_text <- paste(file_lines, collapse = "\n")
@@ -157,7 +172,9 @@ check_edit_conflicts <- function(new_edit_info, file_lines) {
     pending_edit <- the$reviews[[id]]$edit_info
     pending_range <- get_edit_range(pending_edit, file_text)
 
-    if (is.null(pending_range)) next
+    if (is.null(pending_range)) {
+      next
+    }
 
     ranges_overlap <- new_range$start <= pending_range$end &&
       new_range$end >= pending_range$start
@@ -166,7 +183,11 @@ check_edit_conflicts <- function(new_edit_info, file_lines) {
       return(list(
         conflict = TRUE,
         conflicting_edit_id = id,
-        conflicting_edit_intent = if (is.null(pending_edit$intent)) "Edit" else pending_edit$intent
+        conflicting_edit_intent = if (is.null(pending_edit$intent)) {
+          "Edit"
+        } else {
+          pending_edit$intent
+        }
       ))
     }
   }

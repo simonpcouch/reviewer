@@ -16,34 +16,59 @@ render_inline_diff <- function(old_line, new_line) {
   old_chars <- strsplit(old_line, "")[[1]]
   new_chars <- strsplit(new_line, "")[[1]]
 
-  if (length(old_chars) == 0) old_chars <- character(0)
-  if (length(new_chars) == 0) new_chars <- character(0)
+  if (length(old_chars) == 0) {
+    old_chars <- character(0)
+  }
+  if (length(new_chars) == 0) {
+    new_chars <- character(0)
+  }
 
   prefix_len <- 0
 
   min_len <- min(length(old_chars), length(new_chars))
-  while (prefix_len < min_len && old_chars[prefix_len + 1] == new_chars[prefix_len + 1]) {
+  while (
+    prefix_len < min_len &&
+      old_chars[prefix_len + 1] == new_chars[prefix_len + 1]
+  ) {
     prefix_len <- prefix_len + 1
   }
 
   suffix_len <- 0
-  while (suffix_len < (min_len - prefix_len) &&
-         old_chars[length(old_chars) - suffix_len] == new_chars[length(new_chars) - suffix_len]) {
+  while (
+    suffix_len < (min_len - prefix_len) &&
+      old_chars[length(old_chars) - suffix_len] ==
+        new_chars[length(new_chars) - suffix_len]
+  ) {
     suffix_len <- suffix_len + 1
   }
 
-  prefix <- if (prefix_len > 0) paste(old_chars[1:prefix_len], collapse = "") else ""
-  suffix <- if (suffix_len > 0) paste(old_chars[(length(old_chars) - suffix_len + 1):length(old_chars)], collapse = "") else ""
+  prefix <- if (prefix_len > 0) {
+    paste(old_chars[1:prefix_len], collapse = "")
+  } else {
+    ""
+  }
+  suffix <- if (suffix_len > 0) {
+    paste(
+      old_chars[(length(old_chars) - suffix_len + 1):length(old_chars)],
+      collapse = ""
+    )
+  } else {
+    ""
+  }
 
   old_middle_end <- length(old_chars) - suffix_len
   old_middle <- if (old_middle_end >= prefix_len + 1) {
     paste(old_chars[(prefix_len + 1):old_middle_end], collapse = "")
-  } else ""
+  } else {
+    ""
+  }
 
   new_middle_end <- length(new_chars) - suffix_len
   new_middle <- if (new_middle_end >= prefix_len + 1) {
     paste(new_chars[(prefix_len + 1):new_middle_end], collapse = "")
-  } else ""
+  } else {
+    ""
+  }
 
   html_parts <- htmltools::htmlEscape(prefix)
 
@@ -76,7 +101,6 @@ editor_mod_server <- function(
   pending_edits
 ) {
   shiny::moduleServer(id, function(input, output, session) {
-
     output$file_editor <- shiny::renderUI({
       lines <- file_content()
       region <- editable_region()
@@ -100,7 +124,10 @@ editor_mod_server <- function(
             all_diff_lines[[line_num]] <- edit_info$diff_lines[[line_num]]
           }
         }
-        if (!is.null(edit_info$added_lines_display) && !is.null(edit_info$insert_after_line)) {
+        if (
+          !is.null(edit_info$added_lines_display) &&
+            !is.null(edit_info$insert_after_line)
+        ) {
           all_additions[[length(all_additions) + 1]] <- list(
             insert_after = edit_info$insert_after_line,
             lines = edit_info$added_lines_display,
@@ -127,7 +154,10 @@ editor_mod_server <- function(
             class = paste(c(classes, "diff-changed"), collapse = " "),
             `data-line` = i,
             htmltools::tags$span(class = "line-number", i),
-            htmltools::tags$span(class = "line-content", htmltools::HTML(line_content))
+            htmltools::tags$span(
+              class = "line-content",
+              htmltools::HTML(line_content)
+            )
           )
         } else {
           line_classes <- classes
@@ -144,7 +174,10 @@ editor_mod_server <- function(
       })
 
       if (length(all_additions) > 0) {
-        all_additions <- all_additions[order(sapply(all_additions, `[[`, "insert_after"), decreasing = TRUE)]
+        all_additions <- all_additions[order(
+          sapply(all_additions, `[[`, "insert_after"),
+          decreasing = TRUE
+        )]
 
         for (addition in all_additions) {
           insert_pos <- addition$insert_after
@@ -165,7 +198,11 @@ editor_mod_server <- function(
               line_tags <- c(
                 line_tags[1:insert_pos],
                 added_tags,
-                if (insert_pos < length(line_tags)) line_tags[(insert_pos + 1):length(line_tags)] else list()
+                if (insert_pos < length(line_tags)) {
+                  line_tags[(insert_pos + 1):length(line_tags)]
+                } else {
+                  list()
+                }
               )
             }
           }

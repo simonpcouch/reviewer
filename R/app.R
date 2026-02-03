@@ -32,7 +32,7 @@
 #'
 #' @export
 review <- function(file_path, model = NULL, max_pending = NULL) {
- if (!file.exists(file_path)) {
+  if (!file.exists(file_path)) {
     cli::cli_abort("File not found: {.path {file_path}}")
   }
 
@@ -40,7 +40,7 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
   file_lines <- readLines(file_path, warn = FALSE)
 
   # Read system prompt
- system_prompt <- paste(
+  system_prompt <- paste(
     readLines(
       system.file("prompts/main.md", package = "reviewer"),
       warn = FALSE
@@ -59,23 +59,26 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
     bslib::page_fillable(
       theme = bslib::bs_theme(version = 5),
       htmltools::tags$head(
-      htmltools::tags$link(
-        rel = "stylesheet",
-        href = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+        htmltools::tags$link(
+          rel = "stylesheet",
+          href = "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+        ),
+        htmltools::tags$link(
+          rel = "stylesheet",
+          href = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
+        ),
+        htmltools::tags$link(rel = "stylesheet", href = "reviewer/editor.css"),
+        htmltools::tags$link(
+          rel = "stylesheet",
+          href = "reviewer/reviewer.css"
+        ),
+        htmltools::tags$script(
+          src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+        ),
+        # jQuery is included by shiny/bslib already, so scripts load after
+        htmltools::tags$script(src = "reviewer/editor.js"),
+        htmltools::tags$script(src = "reviewer/reviewer.js")
       ),
-      htmltools::tags$link(
-        rel = "stylesheet",
-        href = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
-      ),
-      htmltools::tags$link(rel = "stylesheet", href = "reviewer/editor.css"),
-      htmltools::tags$link(rel = "stylesheet", href = "reviewer/reviewer.css"),
-      htmltools::tags$script(
-        src = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
-      ),
-      # jQuery is included by shiny/bslib already, so scripts load after
-      htmltools::tags$script(src = "reviewer/editor.js"),
-      htmltools::tags$script(src = "reviewer/reviewer.js")
-    ),
 
       bslib::layout_columns(
         col_widths = c(8, 4),
@@ -126,7 +129,9 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
 
     format_review_responses <- function() {
       unseen_ids <- unseen_resolved_reviews()
-      if (length(unseen_ids) == 0) return("")
+      if (length(unseen_ids) == 0) {
+        return("")
+      }
 
       parts <- character()
       for (id in unseen_ids) {
@@ -137,7 +142,10 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
         if (isTRUE(response$approved)) {
           parts <- c(parts, sprintf("Edit '%s': Accepted and applied.", intent))
         } else if (!is.null(response$feedback) && nzchar(response$feedback)) {
-          parts <- c(parts, sprintf("Edit '%s': User feedback: %s", intent, response$feedback))
+          parts <- c(
+            parts,
+            sprintf("Edit '%s': User feedback: %s", intent, response$feedback)
+          )
         } else {
           parts <- c(parts, sprintf("Edit '%s': Rejected by user.", intent))
         }
@@ -176,7 +184,9 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
       response <- input$edit_response
       request_id <- response$request_id
 
-      if (is.null(the$reviews[[request_id]])) return()
+      if (is.null(the$reviews[[request_id]])) {
+        return()
+      }
 
       the$reviews[[request_id]]$status <- "resolved"
       the$reviews[[request_id]]$response <- response
@@ -198,14 +208,23 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
 
         if (!is.null(edit_info$shift) && edit_info$shift > 0) {
           current_region <- shiny::isolate(editable_region())
-          new_start <- min(current_region$start + edit_info$shift, length(new_lines))
-          new_end <- min(current_region$end + edit_info$shift, length(new_lines))
+          new_start <- min(
+            current_region$start + edit_info$shift,
+            length(new_lines)
+          )
+          new_end <- min(
+            current_region$end + edit_info$shift,
+            length(new_lines)
+          )
           editable_region(list(start = new_start, end = new_end))
         }
       }
 
       current_lines <- shiny::isolate(file_content())
-      pending_edits(sort_reviews_by_position(the$reviews[pending_reviews()], current_lines))
+      pending_edits(sort_reviews_by_position(
+        the$reviews[pending_reviews()],
+        current_lines
+      ))
 
       if (!is.null(session$userData$throttle_resolver)) {
         session$userData$throttle_resolver(TRUE)
@@ -233,7 +252,9 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
     )
 
     shiny::observeEvent(stream_task$status(), {
-      if (stream_task$status() %in% c("success", "error") && feedback_pending()) {
+      if (
+        stream_task$status() %in% c("success", "error") && feedback_pending()
+      ) {
         feedback_pending(FALSE)
         start_feedback_turn()
       }
@@ -262,7 +283,6 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
       shiny::stopApp(client)
     })
   }
-
 
   launch_browser <- getOption("reviewer.launch.browser")
   if (!is.function(launch_browser)) {
@@ -317,7 +337,10 @@ format_file_for_llm <- function(
   }
 
   if (visible_lines < length(lines)) {
-    output <- c(output, sprintf("... (%d more lines)", length(lines) - visible_lines))
+    output <- c(
+      output,
+      sprintf("... (%d more lines)", length(lines) - visible_lines)
+    )
   }
 
   paste(output, collapse = "\n")
