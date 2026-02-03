@@ -1,5 +1,10 @@
 .Rproj.user
 plans/
+inst/sandbox/btw/
+inst/sandbox/ellmer/
+inst/sandbox/predictive/
+inst/sandbox/shinychat/
+inst/sandbox/side/
 
 # Downloaded R examples (keep manifest for tracking)
 inst/examples/*.R
