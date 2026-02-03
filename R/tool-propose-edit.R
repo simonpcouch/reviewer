@@ -1,6 +1,6 @@
-tool_propose_edit <- function() {
+tool_propose_edit <- function(n_edits = 3) {
   ellmer::tool(
-    make_propose_edit_impl(),
+    make_propose_edit_impl(n_edits = n_edits),
     name = "propose_edit",
     description = paste(
       "Propose an edit to the code file being reviewed.",
@@ -39,7 +39,7 @@ tool_propose_edit <- function() {
   )
 }
 
-make_propose_edit_impl <- function() {
+make_propose_edit_impl <- function(n_edits = 3) {
   coro::async(function(
     `_intent` = NULL,
     justification = NULL,
@@ -183,7 +183,7 @@ make_propose_edit_impl <- function() {
     pending_edits(sort_reviews_by_position(the$reviews[pending_reviews()], current_lines))
 
     n_pending <- length(pending_reviews())
-    if (n_pending >= 3) {
+    if (n_pending >= n_edits) {
       throttle_promise <- promises::promise(function(resolve, reject) {
         session$userData$throttle_resolver <- resolve
       })
