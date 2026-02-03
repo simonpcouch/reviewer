@@ -10,7 +10,8 @@ and bayesplot. Three lines (tidyr, purrr, and ggplot2) are highlighted
 in red, indicating they've been flagged. The 'Tidy Reviewer' panel
 displays feedback explaining that these three packages are redundant
 because tidyverse already includes them, suggesting their removal to
-simplify dependencies.](inst/reviewer-sc.png)
+simplify
+dependencies.](https://raw.githubusercontent.com/simonpcouch/reviewer/refs/heads/master/inst/reviewer-sc.png)
 
 > \[!NOTE\] This project is highly experimental and was vibe-coded over
 > the course of a couple hours; expect many rough edges.
