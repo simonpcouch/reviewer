@@ -13,3 +13,5 @@ Also, read the files in `R/`, `inst/sandbox/tool_results.md`, and
 
 For read-only context, the source code for the btw, ellmer, shinychat,
 and side packages is cloned into `inst/sandbox`.
+
+Always run `air format .` after writing R code.
