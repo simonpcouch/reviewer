@@ -13,11 +13,11 @@ The reviewer package makes use of the following user-facing options:
 
   - A model string in `"provider/model"` format as described in
     [`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html)
-    (e.g., `"anthropic/claude-sonnet-4-5-20250929"`)
+    (e.g., `"anthropic/claude-sonnet-4-5"`)
 
   Typically set in your `.Rprofile`:
 
-      options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5-20250514"))
+      options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5"))
       # or
       options(reviewer.chat = "openai/gpt-5")
 
