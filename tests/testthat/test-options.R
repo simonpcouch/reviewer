@@ -1,3 +1,5 @@
+# Tests for reviewer.chat option
+
 test_that("get_reviewer_chat() returns NULL when option not set", {
   withr::local_options(reviewer.chat = NULL)
   expect_null(get_reviewer_chat())
@@ -67,4 +69,41 @@ test_that("new_reviewer_chat() errors for invalid option type", {
 test_that("new_reviewer_chat() errors for non-scalar string option", {
  withr::local_options(reviewer.chat = c("model1", "model2"))
   expect_snapshot(new_reviewer_chat(NULL, "system prompt"), error = TRUE)
+})
+
+# Tests for reviewer.pending_edits option
+
+test_that("get_reviewer_pending_edits() returns default when no option or argument", {
+  withr::local_options(reviewer.pending_edits = NULL)
+  expect_equal(get_reviewer_pending_edits(NULL), 3)
+})
+
+test_that("get_reviewer_pending_edits() uses argument when provided", {
+  withr::local_options(reviewer.pending_edits = 5)
+  expect_equal(get_reviewer_pending_edits(7), 7)
+})
+
+test_that("get_reviewer_pending_edits() uses option when argument is NULL", {
+  withr::local_options(reviewer.pending_edits = 5)
+  expect_equal(get_reviewer_pending_edits(NULL), 5)
+})
+
+test_that("get_reviewer_pending_edits() coerces numeric to integer", {
+  withr::local_options(reviewer.pending_edits = 4.8)
+  expect_identical(get_reviewer_pending_edits(NULL), 4L)
+})
+
+test_that("get_reviewer_pending_edits() errors for non-numeric option", {
+  withr::local_options(reviewer.pending_edits = "five")
+  expect_snapshot(get_reviewer_pending_edits(NULL), error = TRUE)
+})
+
+test_that("get_reviewer_pending_edits() errors for non-scalar option", {
+  withr::local_options(reviewer.pending_edits = c(3, 5))
+  expect_snapshot(get_reviewer_pending_edits(NULL), error = TRUE)
+})
+
+test_that("get_reviewer_pending_edits() errors for non-positive option", {
+  withr::local_options(reviewer.pending_edits = 0)
+  expect_snapshot(get_reviewer_pending_edits(NULL), error = TRUE)
 })

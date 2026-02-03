@@ -4,14 +4,20 @@
 \alias{review}
 \title{Review an R script with an LLM}
 \usage{
-review(file_path, model = "anthropic/claude-sonnet-4-5-20250929")
+review(file_path, model = NULL, max_pending = NULL)
 }
 \arguments{
 \item{file_path}{Path to the R file to review.}
 
 \item{model}{The model to use for the review, specified as a
 \code{"provider/model"} string in the same format as \code{\link[ellmer:chat-any]{ellmer::chat()}}.
-Defaults to Claude Sonnet 4.5.}
+If not provided, the \code{reviewer.chat} option must be set.
+See \link{reviewer_options} for details.}
+
+\item{max_pending}{Maximum number of pending edits allowed at once before the
+model waits for user responses. Higher values reduce wait time but may
+feel more overwhelming and risk edit conflicts. If not provided, the
+\code{reviewer.pending_edits} option is used. Defaults to 3.}
 }
 \value{
 The function's main purpose is its side-effect, a Docs-style
@@ -27,8 +33,11 @@ file immediately.
 }
 \examples{
 \dontrun{
+# Set the chat option in your .Rprofile
+options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5-20250514"))
 review("analysis.R")
 
+# Or pass the model directly
 review("script.R", model = "openai/gpt-5")
 }
 

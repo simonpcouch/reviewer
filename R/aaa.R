@@ -49,6 +49,31 @@ new_reviewer_chat <- function(model, system_prompt, call = rlang::caller_env()) 
   )
 }
 
+get_reviewer_pending_edits <- function(max_pending = NULL) {
+  if (!is.null(max_pending)) {
+    return(max_pending)
+  }
+
+  option_value <- getOption("reviewer.pending_edits")
+
+  if (is.null(option_value)) {
+    return(3)
+  }
+
+  if (is.numeric(option_value) && length(option_value) == 1 && option_value >= 1) {
+    return(as.integer(option_value))
+  }
+
+  cli::cli_abort(
+    c(
+      "!" = "The option {.code reviewer.pending_edits} must be a positive integer,
+             not {.obj_type_friendly {option_value}}.",
+      "i" = "Set e.g. {.code options(reviewer.pending_edits = 5)}
+             in your {.file ~/.Rprofile}."
+    )
+  )
+}
+
 pending_reviews <- function() {
 
   names(Filter(function(r) r$status == "pending", the$reviews))

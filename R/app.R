@@ -13,10 +13,11 @@
 #'   See [reviewer_options] for details.
 #' @param max_pending Maximum number of pending edits allowed at once before the
 #'   model waits for user responses. Higher values reduce wait time but may
-#'   feel more overwhelming and risk edit conflicts. Defaults to 3.
+#'   feel more overwhelming and risk edit conflicts. If not provided, the
+#'   `reviewer.pending_edits` option is used. Defaults to 3.
 #'
-#' @returns The function's main purpose is its side-effect, a Docs-style 
-#' interface opened in the browser. On app close, the [ellmer::Chat] object 
+#' @returns The function's main purpose is its side-effect, a Docs-style
+#' interface opened in the browser. On app close, the [ellmer::Chat] object
 #' used for the review session is returned (invisibly).
 #'
 #' @examples
@@ -30,7 +31,7 @@
 #' }
 #'
 #' @export
-review <- function(file_path, model = NULL, max_pending = 3) {
+review <- function(file_path, model = NULL, max_pending = NULL) {
  if (!file.exists(file_path)) {
     cli::cli_abort("File not found: {.path {file_path}}")
   }

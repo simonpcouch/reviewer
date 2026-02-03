@@ -1,4 +1,4 @@
-tool_propose_edit <- function(max_pending = 3) {
+tool_propose_edit <- function(max_pending = NULL) {
   ellmer::tool(
     make_propose_edit_impl(max_pending = max_pending),
     name = "propose_edit",
@@ -39,7 +39,9 @@ tool_propose_edit <- function(max_pending = 3) {
   )
 }
 
-make_propose_edit_impl <- function(max_pending = 3) {
+make_propose_edit_impl <- function(max_pending = NULL) {
+  max_pending <- get_reviewer_pending_edits(max_pending)
+
   coro::async(function(
     `_intent` = NULL,
     justification = NULL,
