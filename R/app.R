@@ -267,14 +267,6 @@ review <- function(
   shiny::runApp(shiny::shinyApp(ui, server), launch.browser = launch_browser)
 }
 
-#' Format file content for the LLM with editable region markers
-#'
-#' @param lines Character vector of file lines
-#' @param editable_start Start line of editable region
-#' @param editable_end End line of editable region
-#' @param visible_lines Number of lines to show (default 50)
-#' @return Formatted string for LLM consumption
-#' @noRd
 format_file_for_llm <- function(
   lines,
   editable_start,

@@ -1,7 +1,3 @@
-#' Create the propose_edit tool
-#'
-#' @return An ellmer tool definition
-#' @noRd
 tool_propose_edit <- function() {
   ellmer::tool(
     make_propose_edit_impl(),
@@ -43,9 +39,6 @@ tool_propose_edit <- function() {
   )
 }
 
-#' Factory to create the propose_edit implementation
-#'
-#' @noRd
 make_propose_edit_impl <- function() {
   coro::async(function(
     `_intent` = NULL,
@@ -206,9 +199,6 @@ make_propose_edit_impl <- function() {
   })
 }
 
-#' Calculate diff information for display
-#'
-#' @noRd
 calculate_diff_info <- function(
   lines,
   old_str,
@@ -380,9 +370,6 @@ line_similarity <- function(a, b) {
   common_len / min(length(a_chars), length(b_chars))
 }
 
-#' Apply edit to file lines
-#'
-#' @noRd
 apply_edit_to_lines <- function(
   lines,
   old_str,

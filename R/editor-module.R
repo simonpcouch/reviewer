@@ -1,8 +1,3 @@
-#' Editor Module UI
-#'
-#' @param id Module ID
-#' @return Shiny UI element
-#' @noRd
 editor_mod_ui <- function(id) {
   ns <- shiny::NS(id)
 
@@ -74,14 +69,6 @@ render_inline_diff <- function(old_line, new_line) {
   html_parts
 }
 
-#' Editor Module Server
-#'
-#' @param id Module ID
-#' @param file_content Reactive value containing file lines
-#' @param editable_region Reactive value containing list(start, end)
-#' @param pending_edits Reactive value containing list of pending edits
-#' @return List of module functions
-#' @noRd
 editor_mod_server <- function(
   id,
   file_content,
