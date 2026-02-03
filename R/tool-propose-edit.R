@@ -155,11 +155,10 @@ make_propose_edit_impl <- function() {
     conflict <- check_edit_conflicts(proposed_edit_info, current_lines)
     if (!is.null(conflict)) {
       return(ellmer::ContentToolResult(
-        value = sprintf(
-          "Error: This edit conflicts with a pending edit ('%s'). Wait for the user to accept or reject that edit before proposing overlapping changes.",
+        error = sprintf(
+          "This edit conflicts with a pending edit ('%s'). Wait for the user to accept or reject that edit before proposing overlapping changes.",
           conflict$conflicting_edit_intent
-        ),
-        error = "Conflicting edit"
+        )
       ))
     }
 
