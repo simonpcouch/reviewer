@@ -183,7 +183,7 @@ make_propose_edit_impl <- function() {
     pending_edits(sort_reviews_by_position(the$reviews[pending_reviews()], current_lines))
 
     n_pending <- length(pending_reviews())
-    if (n_pending >= 2) {
+    if (n_pending >= 3) {
       throttle_promise <- promises::promise(function(resolve, reject) {
         session$userData$throttle_resolver <- resolve
       })
