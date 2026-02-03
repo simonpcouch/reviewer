@@ -14,12 +14,12 @@ The option can be either:
 \itemize{
 \item An \link[ellmer:Chat]{ellmer::Chat} object (e.g., \code{ellmer::chat_claude()})
 \item A model string in \code{"provider/model"} format as described in \code{\link[ellmer:chat-any]{ellmer::chat()}}
-(e.g., \code{"anthropic/claude-sonnet-4-5-20250929"})
+(e.g., \code{"anthropic/claude-sonnet-4-5"})
 }
 
 Typically set in your \code{.Rprofile}:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5-20250514"))
+\if{html}{\out{<div class="sourceCode">}}\preformatted{options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5"))
 # or
 options(reviewer.chat = "openai/gpt-5")
 }\if{html}{\out{</div>}}
