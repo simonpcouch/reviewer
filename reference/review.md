@@ -9,7 +9,7 @@ the file immediately.
 ## Usage
 
 ``` r
-review(file_path, model = "anthropic/claude-sonnet-4-5-20250929")
+review(file_path, model = NULL, max_pending = NULL)
 ```
 
 ## Arguments
@@ -23,7 +23,16 @@ review(file_path, model = "anthropic/claude-sonnet-4-5-20250929")
   The model to use for the review, specified as a `"provider/model"`
   string in the same format as
   [`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html).
-  Defaults to Claude Sonnet 4.5.
+  If not provided, the `reviewer.chat` option must be set. See
+  [reviewer_options](https://simonpcouch.github.io/reviewer/reference/reviewer_options.md)
+  for details.
+
+- max_pending:
+
+  Maximum number of pending edits allowed at once before the model waits
+  for user responses. Higher values reduce wait time but may feel more
+  overwhelming and risk edit conflicts. If not provided, the
+  `reviewer.pending_edits` option is used. Defaults to 3.
 
 ## Value
 
@@ -36,8 +45,11 @@ used for the review session is returned (invisibly).
 
 ``` r
 if (FALSE) { # \dontrun{
+# Set the chat option in your .Rprofile
+options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5-20250514"))
 review("analysis.R")
 
+# Or pass the model directly
 review("script.R", model = "openai/gpt-5")
 } # }
 ```
