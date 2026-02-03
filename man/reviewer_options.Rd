@@ -19,7 +19,7 @@ The option can be either:
 
 Typically set in your \code{.Rprofile}:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5"))
+\if{html}{\out{<div class="sourceCode">}}\preformatted{options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 # or
 options(reviewer.chat = "openai/gpt-5")
 }\if{html}{\out{</div>}}
