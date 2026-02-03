@@ -8,7 +8,8 @@ your code for reproducibility, readability, and resilience:
 
 <img src="inst/reviewer-sc.png" alt="A code editor containing R code with a panel on the right showing a comment from 'Tidy reviewer'. On the left, the workspace setup section loads various libraries including tidyverse, extraDistr, MASS, cmdstanr, and bayesplot. Three lines (tidyr, purrr, and ggplot2) are highlighted in red, indicating they've been flagged. The 'Tidy Reviewer' panel displays feedback explaining that these three packages are redundant because tidyverse already includes them, suggesting their removal to simplify dependencies." width="100%" />
 
-> [!NOTE] This project is highly experimental and was vibe-coded over
+> [!NOTE] 
+> This project is highly experimental and was vibe-coded over
 > the course of a couple hours; expect many rough edges.
 
 ## Installation
