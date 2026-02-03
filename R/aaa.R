@@ -15,7 +15,7 @@ new_reviewer_chat <- function(model, system_prompt, call = rlang::caller_env()) 
         "!" = "reviewer requires configuring an ellmer Chat with the
                {.code reviewer.chat} option or the {.arg model} argument.",
         "i" = "Set e.g.
-               {.code options(reviewer.chat = ellmer::chat_claude())}
+               {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5-20250514\"))}
                in your {.file ~/.Rprofile} and restart R."
       ),
       call = call
@@ -41,7 +41,7 @@ new_reviewer_chat <- function(model, system_prompt, call = rlang::caller_env()) 
       "!" = "The option {.code reviewer.chat} must be an ellmer Chat object or
              a model string, not {.obj_type_friendly {chat_option}}.",
       "i" = "Set e.g.
-             {.code options(reviewer.chat = ellmer::chat_claude())}
+             {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5-20250514\"))}
              or {.code options(reviewer.chat = \"openai/gpt-5\")}
              in your {.file ~/.Rprofile}."
     ),
