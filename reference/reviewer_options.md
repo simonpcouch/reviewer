@@ -17,7 +17,7 @@ The reviewer package makes use of the following user-facing options:
 
   Typically set in your `.Rprofile`:
 
-      options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5"))
+      options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
       # or
       options(reviewer.chat = "openai/gpt-5")
 
