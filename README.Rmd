@@ -30,6 +30,9 @@ As if a member of the tidyverse team were there with you to workshop your code f
 knitr::include_graphics("inst/reviewer-sc.png")
 ```
 
+> [!NOTE]
+> This project is highly experimental and was vibe-coded over the course of a couple hours; expect many rough edges.
+
 ## Installation
 
 Install reviewer from GitHub with:
@@ -57,7 +60,7 @@ review("path/to/your/script.R")
 
 This opens a Shiny app where you can accept or reject the suggested improvements to your code.
 
-By default, `review()` uses Claude Sonnet 4. To change models, provide a `provider/model` string in the same manner you would to [`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html) to the `model` argument:
+By default, `review()` uses Claude Sonnet 4.5. To change models, provide a `provider/model` string in the same manner you would to [`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html) to the `model` argument:
 
 ```r
 review("path/to/your/script.R", model = "openai/gpt-5")
