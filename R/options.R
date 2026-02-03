@@ -7,7 +7,8 @@
 #'   When set, it takes precedence over the `model` argument to [review()].
 #'   The option can be either:
 #'   - An [ellmer::Chat] object (e.g., `ellmer::chat_claude()`)
-#'   - A model string in `"provider/model"` format (e.g., `"anthropic/claude-sonnet-4-5-20250929"`)
+#'   - A model string in `"provider/model"` format as described in [ellmer::chat()]
+#'     (e.g., `"anthropic/claude-sonnet-4-5-20250929"`)
 #'
 #'   Typically set in your `.Rprofile`:
 #'   ```
