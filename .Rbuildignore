@@ -8,3 +8,7 @@ CLAUDE.md
 ^inst/examples$
 inst/reviewer.png
 inst/reviewer-sc.png
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
