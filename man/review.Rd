@@ -2,15 +2,34 @@
 % Please edit documentation in R/app.R
 \name{review}
 \alias{review}
-\title{Launch the Tidy Reviewer App}
+\title{Review an R script with an LLM}
 \usage{
-review(file_path, model = "anthropic/claude-sonnet-4-20250514")
+review(file_path, model = "anthropic/claude-sonnet-4-5-20250929")
 }
 \arguments{
-\item{file_path}{Path to the R file to review}
+\item{file_path}{Path to the R file to review.}
 
-\item{model}{The model to use for the review (default: claude-sonnet-4-20250514)}
+\item{model}{The model to use for the review, specified as a
+\code{"provider/model"} string in the same format as \code{\link[ellmer:chat-any]{ellmer::chat()}}.
+Defaults to Claude Sonnet 4.5.}
+}
+\value{
+The function's main purpose is its side-effect, a Docs-style
+interface opened in the browser. On app close, the \link[ellmer:Chat]{ellmer::Chat} object
+used for the review session is returned (invisibly).
 }
 \description{
-Launch the Tidy Reviewer App
+Launches an interactive Shiny app where an LLM reviews your R code and
+suggests improvements for reproducibility, readability, and resilience.
+The app displays your code with proposed edits highlighted inline. You can
+accept or reject each suggestion, and accepted edits are applied to the
+file immediately.
+}
+\examples{
+\dontrun{
+review("analysis.R")
+
+review("script.R", model = "openai/gpt-5")
+}
+
 }

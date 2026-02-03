@@ -1,11 +1,31 @@
-#' Launch the Tidy Reviewer App
+#' Review an R script with an LLM
 #'
-#' @param file_path Path to the R file to review
-#' @param model The model to use for the review (default: claude-sonnet-4-20250514)
+#' Launches an interactive Shiny app where an LLM reviews your R code and
+#' suggests improvements for reproducibility, readability, and resilience.
+#' The app displays your code with proposed edits highlighted inline. You can
+#' accept or reject each suggestion, and accepted edits are applied to the
+#' file immediately.
+#'
+#' @param file_path Path to the R file to review.
+#' @param model The model to use for the review, specified as a
+#'   `"provider/model"` string in the same format as [ellmer::chat()].
+#'   Defaults to Claude Sonnet 4.5.
+#'
+#' @returns The function's main purpose is its side-effect, a Docs-style 
+#' interface opened in the browser. On app close, the [ellmer::Chat] object 
+#' used for the review session is returned (invisibly).
+#'
+#' @examples
+#' \dontrun{
+#' review("analysis.R")
+#'
+#' review("script.R", model = "openai/gpt-5")
+#' }
+#'
 #' @export
 review <- function(
   file_path,
-  model = "anthropic/claude-sonnet-4-20250514"
+  model = "anthropic/claude-sonnet-4-5-20250929"
 ) {
  if (!file.exists(file_path)) {
     cli::cli_abort("File not found: {.path {file_path}}")
