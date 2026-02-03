@@ -4,18 +4,15 @@
 \alias{review}
 \title{Review an R script with an LLM}
 \usage{
-review(
-  file_path,
-  model = "anthropic/claude-sonnet-4-5-20250929",
-  max_pending = NULL
-)
+review(file_path, model = NULL, max_pending = NULL)
 }
 \arguments{
 \item{file_path}{Path to the R file to review.}
 
 \item{model}{The model to use for the review, specified as a
 \code{"provider/model"} string in the same format as \code{\link[ellmer:chat-any]{ellmer::chat()}}.
-Defaults to Claude Sonnet 4.5.}
+If not provided, the \code{reviewer.chat} option must be set.
+See \link{reviewer_options} for details.}
 
 \item{max_pending}{Maximum number of pending edits allowed at once before the
 model waits for user responses. Higher values reduce wait time but may
@@ -36,8 +33,11 @@ file immediately.
 }
 \examples{
 \dontrun{
+# Set the chat option in your .Rprofile
+options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5-20250514"))
 review("analysis.R")
 
+# Or pass the model directly
 review("script.R", model = "openai/gpt-5")
 }
 
