@@ -48,6 +48,10 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
     collapse = "\n"
   )
 
+  # Validate chat configuration early (before launching Shiny)
+  client <- new_reviewer_chat(model, system_prompt)
+  client$register_tool(tool_propose_edit(max_pending = max_pending))
+
 
   ui <- function(req) {
     bslib::page_fillable(
@@ -94,9 +98,6 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
 
   server <- function(input, output, session) {
     shiny::addResourcePath("reviewer", system.file("www", package = "reviewer"))
-
-    client <- new_reviewer_chat(model, system_prompt)
-    client$register_tool(tool_propose_edit(max_pending = max_pending))
 
     reset_reviews()
 
