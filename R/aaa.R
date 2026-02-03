@@ -2,6 +2,53 @@ the <- rlang::new_environment()
 
 the$reviews <- list()
 
+get_reviewer_chat <- function() {
+  getOption("reviewer.chat")
+}
+
+new_reviewer_chat <- function(model, system_prompt, call = rlang::caller_env()) {
+  chat_option <- get_reviewer_chat()
+
+  if (is.null(chat_option) && is.null(model)) {
+    cli::cli_abort(
+      c(
+        "!" = "reviewer requires configuring an ellmer Chat with the
+               {.code reviewer.chat} option or the {.arg model} argument.",
+        "i" = "Set e.g.
+               {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5-20250514\"))}
+               in your {.file ~/.Rprofile} and restart R."
+      ),
+      call = call
+    )
+  }
+
+  if (is.null(chat_option)) {
+    return(ellmer::chat(model, system_prompt = system_prompt, echo = "output"))
+  }
+
+  if (inherits(chat_option, "Chat")) {
+    client <- chat_option$clone()
+    client$set_system_prompt(system_prompt)
+    return(client)
+  }
+
+  if (is.character(chat_option) && length(chat_option) == 1) {
+    return(ellmer::chat(chat_option, system_prompt = system_prompt, echo = "output"))
+  }
+
+  cli::cli_abort(
+    c(
+      "!" = "The option {.code reviewer.chat} must be an ellmer Chat object or
+             a model string, not {.obj_type_friendly {chat_option}}.",
+      "i" = "Set e.g.
+             {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5-20250514\"))}
+             or {.code options(reviewer.chat = \"openai/gpt-5\")}
+             in your {.file ~/.Rprofile}."
+    ),
+    call = call
+  )
+}
+
 pending_reviews <- function() {
 
   names(Filter(function(r) r$status == "pending", the$reviews))

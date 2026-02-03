@@ -9,7 +9,8 @@
 #' @param file_path Path to the R file to review.
 #' @param model The model to use for the review, specified as a
 #'   `"provider/model"` string in the same format as [ellmer::chat()].
-#'   Defaults to Claude Sonnet 4.5.
+#'   If not provided, the `reviewer.chat` option must be set.
+#'   See [reviewer_options] for details.
 #' @param max_pending Maximum number of pending edits allowed at once before the
 #'   model waits for user responses. Higher values reduce wait time but may
 #'   feel more overwhelming and risk edit conflicts. Defaults to 3.
@@ -20,17 +21,16 @@
 #'
 #' @examples
 #' \dontrun{
+#' # Set the chat option in your .Rprofile
+#' options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5-20250514"))
 #' review("analysis.R")
 #'
+#' # Or pass the model directly
 #' review("script.R", model = "openai/gpt-5")
 #' }
 #'
 #' @export
-review <- function(
-  file_path,
-  model = "anthropic/claude-sonnet-4-5-20250929",
-  max_pending = 3
-) {
+review <- function(file_path, model = NULL, max_pending = 3) {
  if (!file.exists(file_path)) {
     cli::cli_abort("File not found: {.path {file_path}}")
   }
@@ -94,7 +94,7 @@ review <- function(
   server <- function(input, output, session) {
     shiny::addResourcePath("reviewer", system.file("www", package = "reviewer"))
 
-    client <- ellmer::chat(model, system_prompt = system_prompt, echo = "output")
+    client <- new_reviewer_chat(model, system_prompt)
     client$register_tool(tool_propose_edit(max_pending = max_pending))
 
     reset_reviews()
