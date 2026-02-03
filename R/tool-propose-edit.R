@@ -147,6 +147,22 @@ make_propose_edit_impl <- function() {
       }
     }
 
+    proposed_edit_info <- list(
+      old_str = old_str,
+      insert_line = insert_line,
+      str_replace_mode = str_replace_mode
+    )
+    conflict <- check_edit_conflicts(proposed_edit_info, current_lines)
+    if (!is.null(conflict)) {
+      return(ellmer::ContentToolResult(
+        value = sprintf(
+          "Error: This edit conflicts with a pending edit ('%s'). Wait for the user to accept or reject that edit before proposing overlapping changes.",
+          conflict$conflicting_edit_intent
+        ),
+        error = "Conflicting edit"
+      ))
+    }
+
     diff_info <- calculate_diff_info(
       current_lines,
       old_str,
