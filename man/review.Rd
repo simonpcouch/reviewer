@@ -4,7 +4,11 @@
 \alias{review}
 \title{Review an R script with an LLM}
 \usage{
-review(file_path, model = "anthropic/claude-sonnet-4-5-20250929")
+review(
+  file_path,
+  model = "anthropic/claude-sonnet-4-5-20250929",
+  max_pending = NULL
+)
 }
 \arguments{
 \item{file_path}{Path to the R file to review.}
@@ -12,6 +16,11 @@ review(file_path, model = "anthropic/claude-sonnet-4-5-20250929")
 \item{model}{The model to use for the review, specified as a
 \code{"provider/model"} string in the same format as \code{\link[ellmer:chat-any]{ellmer::chat()}}.
 Defaults to Claude Sonnet 4.5.}
+
+\item{max_pending}{Maximum number of pending edits allowed at once before the
+model waits for user responses. Higher values reduce wait time but may
+feel more overwhelming and risk edit conflicts. If not provided, the
+\code{reviewer.pending_edits} option is used. Defaults to 3.}
 }
 \value{
 The function's main purpose is its side-effect, a Docs-style
