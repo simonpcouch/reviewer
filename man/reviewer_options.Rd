@@ -24,10 +24,11 @@ Typically set in your \code{.Rprofile}:
 options(reviewer.chat = "openai/gpt-5")
 }\if{html}{\out{</div>}}
 \item \code{reviewer.pending_edits} controls the maximum number of pending edits
-allowed at once before the model waits for user responses. When set, it
-takes precedence over the \code{max_pending} argument to \code{\link[=review]{review()}}. The option
-must be a positive integer. Higher values reduce wait time but may feel
-more overwhelming and risk edit conflicts. Defaults to 3.
+allowed at once before the model waits for user responses. The
+\code{max_pending} argument to \code{\link[=review]{review()}} takes precedence over this option
+when provided. The option must be a positive integer. Higher values reduce
+wait time but may feel more overwhelming and risk edit conflicts.
+Defaults to 3.
 
 Typically set in your \code{.Rprofile}:
 
