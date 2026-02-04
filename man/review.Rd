@@ -4,12 +4,12 @@
 \alias{review}
 \title{Review an R script with an LLM}
 \usage{
-review(file_path, model = NULL, max_pending = NULL)
+review(file_path, client = NULL, max_pending = NULL)
 }
 \arguments{
 \item{file_path}{Path to the R file to review.}
 
-\item{model}{The model to use for the review, specified as a
+\item{client}{The model to use for the review, specified as a
 \code{"provider/model"} string in the same format as \code{\link[ellmer:chat-any]{ellmer::chat()}}.
 If not provided, the \code{reviewer.chat} option must be set.
 See \link{reviewer_options} for details.}
@@ -38,8 +38,8 @@ file immediately.
 options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 review("analysis.R")
 
-# Or pass the model directly
-review("script.R", model = "openai/gpt-5")
+# Or pass the client directly
+review("script.R", client = "openai/gpt-5")
 }
 
 }

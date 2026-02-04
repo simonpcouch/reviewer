@@ -10,7 +10,7 @@
 The reviewer package makes use of the following user-facing options:
 \itemize{
 \item \code{reviewer.chat} supplies the underlying LLM powering the reviewer.
-When set, it takes precedence over the \code{model} argument to \code{\link[=review]{review()}}.
+The \code{chat} argument to \code{\link[=review]{review()}} takes precedence over this option when provided.
 The option can be either:
 \itemize{
 \item An \link[ellmer:Chat]{ellmer::Chat} object (e.g., \code{ellmer::chat_claude()})
