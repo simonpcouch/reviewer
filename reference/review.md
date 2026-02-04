@@ -23,7 +23,7 @@ review(file_path, client = NULL, max_pending = NULL)
   The model to use for the review, specified as a `"provider/model"`
   string in the same format as
   [`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html).
-  If not provided, the `reviewer.chat` option must be set. See
+  If not provided, the `reviewer.client` option must be set. See
   [reviewer_options](https://simonpcouch.github.io/reviewer/reference/reviewer_options.md)
   for details.
 
@@ -47,8 +47,8 @@ after review.
 
 ``` r
 if (FALSE) { # \dontrun{
-# Set the chat option in your .Rprofile
-options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
+# Set the client option in your .Rprofile
+options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 review("analysis.R")
 
 # Or pass the client directly
