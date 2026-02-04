@@ -4,6 +4,24 @@ the$reviews <- list()
 the$memory_rejected <- FALSE
 the$propose_edit_count <- 0L
 
+pkg_env <- function() {
+  env_name <- "pkg:reviewer"
+  
+  if (env_name %in% search()) {
+    return(as.environment(env_name))
+  }
+  
+  env <- rlang::new_environment(parent = .GlobalEnv)
+  attach(env, name = env_name, warn.conflicts = FALSE)
+  env
+}
+
+set_last_review <- function(chat) {
+  env <- pkg_env()
+  env$.last_review <- chat
+  invisible(chat)
+}
+
 get_reviewer_chat <- function() {
   getOption("reviewer.chat")
 }
