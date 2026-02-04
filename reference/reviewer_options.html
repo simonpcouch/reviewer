@@ -22,6 +22,13 @@ Defaults to 3.
 Typically set in your .Rprofile:
 options(reviewer.pending_edits = 5)
 
+reviewer.memory specifies the path to a file where reviewer stores
+user preferences learned from accepted/rejected edits. When set, reviewer
+uses this file without prompting. When not set, reviewer will ask for
+permission to write to ~/.config/reviewer/memory.md on first launch.
+Typically set in your .Rprofile:
+options(reviewer.memory = "~/.config/reviewer/memory.md")
+
 
 '><meta property="og:description" content='The reviewer package makes use of the following user-facing options:
 reviewer.chat supplies the underlying LLM powering the reviewer.
@@ -45,6 +52,13 @@ wait time but may feel more overwhelming and risk edit conflicts.
 Defaults to 3.
 Typically set in your .Rprofile:
 options(reviewer.pending_edits = 5)
+
+reviewer.memory specifies the path to a file where reviewer stores
+user preferences learned from accepted/rejected edits. When set, reviewer
+uses this file without prompting. When not set, reviewer will ask for
+permission to write to ~/.config/reviewer/memory.md on first launch.
+Typically set in your .Rprofile:
+options(reviewer.memory = "~/.config/reviewer/memory.md")
 
 
 '></head><body>
@@ -97,6 +111,12 @@ wait time but may feel more overwhelming and risk edit conflicts.
 Defaults to 3.</p>
 <p>Typically set in your <code>.Rprofile</code>:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">reviewer.pending_edits =</span> <span class="dv">5</span>)</span></code></pre><p></p></div></li>
+<li><p><code>reviewer.memory</code> specifies the path to a file where reviewer stores
+user preferences learned from accepted/rejected edits. When set, reviewer
+uses this file without prompting. When not set, reviewer will ask for
+permission to write to <code>~/.config/reviewer/memory.md</code> on first launch.</p>
+<p>Typically set in your <code>.Rprofile</code>:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">reviewer.memory =</span> <span class="st">"~/.config/reviewer/memory.md"</span>)</span></code></pre><p></p></div></li>
 </ul></div>
 
 

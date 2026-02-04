@@ -46,7 +46,7 @@ used for the review session is returned (invisibly).
 ``` r
 if (FALSE) { # \dontrun{
 # Set the chat option in your .Rprofile
-options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5-20250514"))
+options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 review("analysis.R")
 
 # Or pass the model directly
