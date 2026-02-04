@@ -39,7 +39,7 @@ review(file_path, model = NULL, max_pending = NULL)
 The function's main purpose is its side-effect, a Docs-style interface
 opened in the browser. On app close, the
 [ellmer::Chat](https://ellmer.tidyverse.org/reference/Chat.html) object
-used for the review session is returned (invisibly).
+used for the review session is returned invisibly.
 
 ## Examples
 
