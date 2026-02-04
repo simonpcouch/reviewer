@@ -67,7 +67,7 @@ get_reviewer_pending_edits <- function(max_pending = NULL) {
   option_value <- getOption("reviewer.pending_edits")
 
   if (is.null(option_value)) {
-    return(3)
+    return(2)
   }
 
   if (

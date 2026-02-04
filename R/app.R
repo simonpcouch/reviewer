@@ -14,7 +14,7 @@
 #' @param max_pending Maximum number of pending edits allowed at once before the
 #'   model waits for user responses. Higher values reduce wait time but may
 #'   feel more overwhelming and risk edit conflicts. If not provided, the
-#'   `reviewer.pending_edits` option is used. Defaults to 3.
+#'   `reviewer.pending_edits` option is used. Defaults to 2.
 #'
 #' @returns The function's main purpose is its side-effect, a Docs-style
 #' interface opened in the browser. On app close, the [ellmer::Chat] object

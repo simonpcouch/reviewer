@@ -17,7 +17,7 @@ See \link{reviewer_options} for details.}
 \item{max_pending}{Maximum number of pending edits allowed at once before the
 model waits for user responses. Higher values reduce wait time but may
 feel more overwhelming and risk edit conflicts. If not provided, the
-\code{reviewer.pending_edits} option is used. Defaults to 3.}
+\code{reviewer.pending_edits} option is used. Defaults to 2.}
 }
 \value{
 The function's main purpose is its side-effect, a Docs-style

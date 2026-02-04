@@ -22,7 +22,7 @@
 #'   `max_pending` argument to [review()] takes precedence over this option
 #'   when provided. The option must be a positive integer. Higher values reduce
 #'   wait time but may feel more overwhelming and risk edit conflicts.
-#'   Defaults to 3.
+#'   Defaults to 2.
 #'
 #'   Typically set in your `.Rprofile`:
 #'   ```
