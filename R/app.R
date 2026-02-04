@@ -7,7 +7,7 @@
 #' file immediately.
 #'
 #' @param file_path Path to the R file to review.
-#' @param model The model to use for the review, specified as a
+#' @param client The model to use for the review, specified as a
 #'   `"provider/model"` string in the same format as [ellmer::chat()].
 #'   If not provided, the `reviewer.chat` option must be set.
 #'   See [reviewer_options] for details.
@@ -18,7 +18,7 @@
 #'
 #' @returns The function's main purpose is its side-effect, a Docs-style
 #' interface opened in the browser. On app close, the [ellmer::Chat] object
-#' used for the review session is returned invisibly. The underlying chat object 
+#' used for the review session is returned invisibly. The underlying chat object
 #' is stored as `.last_review` on the search path for easy access after review.
 #'
 #' @examples
@@ -27,12 +27,12 @@
 #' options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 #' review("analysis.R")
 #'
-#' # Or pass the model directly
-#' review("script.R", model = "openai/gpt-5")
+#' # Or pass the client directly
+#' review("script.R", client = "openai/gpt-5")
 #' }
 #'
 #' @export
-review <- function(file_path, model = NULL, max_pending = NULL) {
+review <- function(file_path, client = NULL, max_pending = NULL) {
   if (!file.exists(file_path)) {
     cli::cli_abort("File not found: {.path {file_path}}")
   }
@@ -55,7 +55,7 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
     system_prompt <- paste(system_prompt, memory_prompt, sep = "\n\n")
   }
 
-  client <- new_reviewer_chat(model, system_prompt)
+  client <- new_reviewer_chat(client, system_prompt)
   client$register_tool(tool_propose_edit(max_pending = max_pending))
   if (!is.null(memory_path)) {
     client$register_tool(tool_remember())

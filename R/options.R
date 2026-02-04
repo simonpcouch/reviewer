@@ -4,7 +4,7 @@
 #' The reviewer package makes use of the following user-facing options:
 #'
 #' * `reviewer.chat` supplies the underlying LLM powering the reviewer.
-#'   When set, it takes precedence over the `model` argument to [review()].
+#'   When set, it takes precedence over the `client` argument to [review()].
 #'   The option can be either:
 #'   - An [ellmer::Chat] object (e.g., `ellmer::chat_claude()`)
 #'   - A model string in `"provider/model"` format as described in [ellmer::chat()]

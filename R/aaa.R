@@ -20,7 +20,9 @@ prompt_provider_selection <- function() {
       name = "Anthropic (Claude Sonnet 4.5)",
       fn_name = "chat_anthropic",
       model = "claude-sonnet-4-5",
-      create_client = function() ellmer::chat_anthropic(model = "claude-sonnet-4-5")
+      create_client = function() {
+        ellmer::chat_anthropic(model = "claude-sonnet-4-5")
+      }
     ),
     list(
       name = "OpenAI (GPT 5.2)",
@@ -32,7 +34,9 @@ prompt_provider_selection <- function() {
       name = "Google Gemini (Gemini 3 Pro)",
       fn_name = "chat_google_gemini",
       model = "gemini-3-pro-preview",
-      create_client = function() ellmer::chat_google_gemini(model = "gemini-3-pro-preview")
+      create_client = function() {
+        ellmer::chat_google_gemini(model = "gemini-3-pro-preview")
+      }
     ),
     list(
       name = "GitHub (GPT 4.1)",
@@ -74,7 +78,7 @@ prompt_provider_selection <- function() {
       c(
         "Set the {.code reviewer.chat} option with
          {.code options(reviewer.chat = ellmer::chat_*())} or provide
-         a {.arg model} argument to continue.",
+         a {.arg client} argument to continue.",
         "i" = "See {.help reviewer::review} for more information."
       ),
       call = rlang::call2("reviewer::review")
@@ -137,7 +141,9 @@ persist_client_option <- function(fn_name, model) {
   new_content <- c(existing, "", option_line)
   writeLines(new_content, rprofile_path)
 
-  cli::cli_alert_success("Added {.code {option_line}} to {.file {rprofile_path}}.")
+  cli::cli_alert_success(
+    "Added {.code {option_line}} to {.file {rprofile_path}}."
+  )
   invisible(NULL)
 }
 
@@ -164,13 +170,13 @@ get_reviewer_chat <- function() {
 }
 
 new_reviewer_chat <- function(
-  model,
+  client,
   system_prompt,
   call = rlang::caller_env()
 ) {
   chat_option <- get_reviewer_chat()
 
-  if (is.null(chat_option) && is.null(model)) {
+  if (is.null(chat_option) && is.null(client)) {
     if (!interactive()) {
       cli::cli_abort(
         c(
@@ -185,7 +191,7 @@ new_reviewer_chat <- function(
   }
 
   if (is.null(chat_option)) {
-    return(ellmer::chat(model, system_prompt = system_prompt, echo = "output"))
+    return(ellmer::chat(client, system_prompt = system_prompt, echo = "output"))
   }
 
   if (inherits(chat_option, "Chat")) {
