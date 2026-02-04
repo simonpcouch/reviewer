@@ -18,7 +18,7 @@
 #'
 #' @returns The function's main purpose is its side-effect, a Docs-style
 #' interface opened in the browser. On app close, the [ellmer::Chat] object
-#' used for the review session is returned (invisibly).
+#' used for the review session is returned invisibly.
 #'
 #' @examples
 #' \dontrun{
@@ -284,12 +284,12 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
 
     # Close button handler - return the client
     shiny::observeEvent(input$close_btn, {
-      shiny::stopApp(client)
+      shiny::stopApp(invisible(client))
     })
 
     # Also return client if session ends
     session$onSessionEnded(function() {
-      shiny::stopApp(client)
+      shiny::stopApp(invisible(client))
     })
   }
 

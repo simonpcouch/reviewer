@@ -22,7 +22,7 @@ feel more overwhelming and risk edit conflicts. If not provided, the
 \value{
 The function's main purpose is its side-effect, a Docs-style
 interface opened in the browser. On app close, the \link[ellmer:Chat]{ellmer::Chat} object
-used for the review session is returned (invisibly).
+used for the review session is returned invisibly.
 }
 \description{
 Launches an interactive Shiny app where an LLM reviews your R code and
