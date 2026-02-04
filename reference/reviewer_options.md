@@ -27,7 +27,7 @@ The reviewer package makes use of the following user-facing options:
   [`review()`](https://simonpcouch.github.io/reviewer/reference/review.md)
   takes precedence over this option when provided. The option must be a
   positive integer. Higher values reduce wait time but may feel more
-  overwhelming and risk edit conflicts. Defaults to 3.
+  overwhelming and risk edit conflicts. Defaults to 2.
 
   Typically set in your `.Rprofile`:
 
