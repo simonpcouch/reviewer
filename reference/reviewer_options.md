@@ -2,10 +2,11 @@
 
 The reviewer package makes use of the following user-facing options:
 
-- `reviewer.chat` supplies the underlying LLM powering the reviewer.
-  When set, it takes precedence over the `model` argument to
-  [`review()`](https://simonpcouch.github.io/reviewer/reference/review.md).
-  The option can be either:
+- `reviewer.chat` supplies the underlying LLM powering the reviewer. The
+  `chat` argument to
+  [`review()`](https://simonpcouch.github.io/reviewer/reference/review.md)
+  takes precedence over this option when provided. The option can be
+  either:
 
   - An [ellmer::Chat](https://ellmer.tidyverse.org/reference/Chat.html)
     object (e.g.,

@@ -9,7 +9,7 @@ the file immediately.
 ## Usage
 
 ``` r
-review(file_path, model = NULL, max_pending = NULL)
+review(file_path, client = NULL, max_pending = NULL)
 ```
 
 ## Arguments
@@ -18,7 +18,7 @@ review(file_path, model = NULL, max_pending = NULL)
 
   Path to the R file to review.
 
-- model:
+- client:
 
   The model to use for the review, specified as a `"provider/model"`
   string in the same format as
@@ -51,7 +51,7 @@ if (FALSE) { # \dontrun{
 options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 review("analysis.R")
 
-# Or pass the model directly
-review("script.R", model = "openai/gpt-5")
+# Or pass the client directly
+review("script.R", client = "openai/gpt-5")
 } # }
 ```
