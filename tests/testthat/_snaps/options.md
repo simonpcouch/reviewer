@@ -4,8 +4,9 @@
       new_reviewer_chat(NULL, "system prompt")
     Condition
       Error:
-      ! reviewer requires configuring an ellmer Chat with the `reviewer.client` option or the `model` argument.
-      i Set e.g. `options(reviewer.client = ellmer::chat_claude("claude-sonnet-4-5"))` in your '~/.Rprofile' and restart R.
+      ! Setup requires an interactive R session.
+      i Set `options(reviewer.client = ellmer::chat_*())` to continue.
+      i See `?reviewer::review()` for more information.
 
 # new_reviewer_chat() errors for invalid option type
 
