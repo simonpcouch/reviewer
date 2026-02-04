@@ -12,6 +12,7 @@ test_that("get_reviewer_client() returns the option value", {
 
 test_that("new_reviewer_chat() errors when no option or model provided", {
   withr::local_options(reviewer.client = NULL)
+  local_mocked_bindings(interactive = function() FALSE)
   expect_snapshot(new_reviewer_chat(NULL, "system prompt"), error = TRUE)
 })
 
@@ -74,7 +75,7 @@ test_that("new_reviewer_chat() errors for non-scalar string option", {
 
 test_that("get_reviewer_pending_edits() returns default when no option or argument", {
   withr::local_options(reviewer.pending_edits = NULL)
-  expect_equal(get_reviewer_pending_edits(NULL), 3)
+  expect_equal(get_reviewer_pending_edits(NULL), 2)
 })
 
 test_that("get_reviewer_pending_edits() uses argument when provided", {
