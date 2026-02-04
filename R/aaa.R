@@ -4,13 +4,150 @@ the$reviews <- list()
 the$memory_rejected <- FALSE
 the$propose_edit_count <- 0L
 
+provider_available <- function(chat_fn) {
+  tryCatch(
+    {
+      suppressWarnings(suppressMessages(chat_fn()))
+      TRUE
+    },
+    error = function(e) FALSE
+  )
+}
+
+prompt_provider_selection <- function() {
+  providers <- list(
+    list(
+      name = "Anthropic (Claude Sonnet 4.5)",
+      fn_name = "chat_anthropic",
+      model = "claude-sonnet-4-5",
+      create_client = function() ellmer::chat_anthropic(model = "claude-sonnet-4-5")
+    ),
+    list(
+      name = "OpenAI (GPT 5.2)",
+      fn_name = "chat_openai",
+      model = "gpt-5.2",
+      create_client = function() ellmer::chat_openai(model = "gpt-5.2")
+    ),
+    list(
+      name = "Google Gemini (Gemini 3 Pro)",
+      fn_name = "chat_google_gemini",
+      model = "gemini-3-pro-preview",
+      create_client = function() ellmer::chat_google_gemini(model = "gemini-3-pro-preview")
+    ),
+    list(
+      name = "GitHub (GPT 4.1)",
+      fn_name = "chat_github",
+      model = "gpt-4.1",
+      create_client = function() ellmer::chat_github(model = "gpt-4.1")
+    )
+  )
+
+  for (i in seq_along(providers)) {
+    providers[[i]]$available <- provider_available(providers[[i]]$create_client)
+  }
+
+  available_providers <- Filter(function(p) p$available, providers)
+
+  if (length(available_providers) == 0) {
+    cli::cli_abort(
+      "Could not auto-discover an LLM provider, see {.help reviewer::review}.",
+      call = NULL
+    )
+  }
+
+  choices <- c(
+    vapply(available_providers, function(p) p$name, character(1)),
+    "Some other provider/model"
+  )
+
+  selection <- utils::menu(
+    choices,
+    title = "Which provider/model would you like to use with `review()`?"
+  )
+
+  if (selection == 0) {
+    cli::cli_abort("Setup cancelled.", call = NULL)
+  }
+
+  if (selection == length(choices)) {
+    cli::cli_abort(
+      c(
+        "Set the {.code reviewer.chat} option with
+         {.code options(reviewer.chat = ellmer::chat_*())} or provide
+         a {.arg model} argument to continue.",
+        "i" = "See {.help reviewer::review} for more information."
+      ),
+      call = rlang::call2("reviewer::review")
+    )
+  }
+
+  selected_info <- available_providers[[selection]]
+  client <- selected_info$create_client()
+  options(reviewer.chat = client)
+
+  prompt_persistence_selection(selected_info$fn_name, selected_info$model)
+
+  client
+}
+
+prompt_persistence_selection <- function(fn_name, model) {
+  choices <- c(
+    "Just for this R session",
+    "In this and future R sessions"
+  )
+
+  selection <- utils::menu(choices, title = "Store this configuration...")
+
+  if (selection == 0 || selection == 1) {
+    return(invisible(NULL))
+  }
+
+  persist_client_option(fn_name, model)
+  invisible(NULL)
+}
+
+persist_client_option <- function(fn_name, model) {
+  proj_rprofile <- ".Rprofile"
+  use_project <- file.exists(proj_rprofile)
+
+  rprofile_path <- if (use_project) {
+    proj_rprofile
+  } else {
+    path.expand("~/.Rprofile")
+  }
+
+  option_line <- sprintf(
+    "options(reviewer.chat = ellmer::%s(model = \"%s\"))",
+    fn_name,
+    model
+  )
+
+  if (file.exists(rprofile_path)) {
+    existing <- readLines(rprofile_path, warn = FALSE)
+  } else {
+    existing <- character(0)
+  }
+
+  if (any(grepl("reviewer.chat", existing, fixed = TRUE))) {
+    cli::cli_abort(
+      "A {.code reviewer.chat} option already exists in {.file {rprofile_path}}."
+    )
+  }
+
+  new_content <- c(existing, "", option_line)
+  writeLines(new_content, rprofile_path)
+
+  cli::cli_alert_success("Added {.code {option_line}} to {.file {rprofile_path}}.")
+  invisible(NULL)
+}
+
 pkg_env <- function() {
   env_name <- "pkg:reviewer"
-  
+
   if (env_name %in% search()) {
     return(as.environment(env_name))
   }
-  
+
   env <- rlang::new_environment(parent = .GlobalEnv)
   attach(env, name = env_name, warn.conflicts = FALSE)
   env
@@ -34,16 +171,17 @@ new_reviewer_chat <- function(
   chat_option <- get_reviewer_chat()
 
   if (is.null(chat_option) && is.null(model)) {
-    cli::cli_abort(
-      c(
-        "!" = "reviewer requires configuring an ellmer Chat with the
-               {.code reviewer.chat} option or the {.arg model} argument.",
-        "i" = "Set e.g.
-               {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5\"))}
-               in your {.file ~/.Rprofile} and restart R."
-      ),
-      call = call
-    )
+    if (!interactive()) {
+      cli::cli_abort(
+        c(
+          "!" = "Setup requires an interactive R session.",
+          "i" = "Set {.code options(reviewer.chat = ellmer::chat_*())} to continue.",
+          "i" = "See {.help reviewer::review} for more information."
+        ),
+        call = NULL
+      )
+    }
+    chat_option <- prompt_provider_selection()
   }
 
   if (is.null(chat_option)) {
