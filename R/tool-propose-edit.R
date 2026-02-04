@@ -200,6 +200,7 @@ make_propose_edit_impl <- function(max_pending = NULL) {
       seen_by_model = FALSE,
       created_at = Sys.time()
     )
+    the$propose_edit_count <- the$propose_edit_count + 1L
 
     pending_edits(sort_reviews_by_position(
       the$reviews[pending_reviews()],

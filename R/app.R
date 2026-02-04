@@ -23,7 +23,7 @@
 #' @examples
 #' \dontrun{
 #' # Set the chat option in your .Rprofile
-#' options(reviewer.chat = ellmer::chat_claude("claude-sonnet-4-5-20250514"))
+#' options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 #' review("analysis.R")
 #'
 #' # Or pass the model directly
@@ -39,7 +39,8 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
   # Read file content
   file_lines <- readLines(file_path, warn = FALSE)
 
-  # Read system prompt
+  memory_path <- setup_memory()
+
   system_prompt <- paste(
     readLines(
       system.file("prompts/main.md", package = "reviewer"),
@@ -48,8 +49,16 @@ review <- function(file_path, model = NULL, max_pending = NULL) {
     collapse = "\n"
   )
 
+  memory_prompt <- read_memory_for_prompt(memory_path)
+  if (!is.null(memory_prompt)) {
+    system_prompt <- paste(system_prompt, memory_prompt, sep = "\n\n")
+  }
+
   client <- new_reviewer_chat(model, system_prompt)
   client$register_tool(tool_propose_edit(max_pending = max_pending))
+  if (!is.null(memory_path)) {
+    client$register_tool(tool_remember())
+  }
 
   if (!"reviewer" %in% names(shiny::resourcePaths())) {
     shiny::addResourcePath("reviewer", system.file("www", package = "reviewer"))

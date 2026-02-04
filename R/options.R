@@ -29,6 +29,16 @@
 #'   options(reviewer.pending_edits = 5)
 #'   ```
 #'
+#' * `reviewer.memory` specifies the path to a file where reviewer stores
+#'   user preferences learned from accepted/rejected edits. When set, reviewer
+#'   uses this file without prompting. When not set, reviewer will ask for
+#'   permission to write to `~/.config/reviewer/memory.md` on first launch.
+#'
+#'   Typically set in your `.Rprofile`:
+#'   ```
+#'   options(reviewer.memory = "~/.config/reviewer/memory.md")
+#'   ```
+#'
 #' @name reviewer_options
-#' @aliases reviewer.chat reviewer.pending_edits
+#' @aliases reviewer.chat reviewer.pending_edits reviewer.memory
 NULL

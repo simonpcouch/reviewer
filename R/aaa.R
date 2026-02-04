@@ -1,6 +1,8 @@
 the <- rlang::new_environment()
 
 the$reviews <- list()
+the$memory_rejected <- FALSE
+the$propose_edit_count <- 0L
 
 get_reviewer_chat <- function() {
   getOption("reviewer.chat")
@@ -19,7 +21,7 @@ new_reviewer_chat <- function(
         "!" = "reviewer requires configuring an ellmer Chat with the
                {.code reviewer.chat} option or the {.arg model} argument.",
         "i" = "Set e.g.
-               {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5-20250514\"))}
+               {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5\"))}
                in your {.file ~/.Rprofile} and restart R."
       ),
       call = call
@@ -49,7 +51,7 @@ new_reviewer_chat <- function(
       "!" = "The option {.code reviewer.chat} must be an ellmer Chat object or
              a model string, not {.obj_type_friendly {chat_option}}.",
       "i" = "Set e.g.
-             {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5-20250514\"))}
+             {.code options(reviewer.chat = ellmer::chat_claude(\"claude-sonnet-4-5\"))}
              or {.code options(reviewer.chat = \"openai/gpt-5\")}
              in your {.file ~/.Rprofile}."
     ),
@@ -197,5 +199,6 @@ check_edit_conflicts <- function(new_edit_info, file_lines) {
 
 reset_reviews <- function() {
   the$reviews <- list()
+  the$propose_edit_count <- 0L
   invisible()
 }

@@ -4,6 +4,7 @@
 \alias{reviewer_options}
 \alias{reviewer.chat}
 \alias{reviewer.pending_edits}
+\alias{reviewer.memory}
 \title{Options used by the reviewer package}
 \description{
 The reviewer package makes use of the following user-facing options:
@@ -33,6 +34,15 @@ Defaults to 3.
 Typically set in your \code{.Rprofile}:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{options(reviewer.pending_edits = 5)
+}\if{html}{\out{</div>}}
+\item \code{reviewer.memory} specifies the path to a file where reviewer stores
+user preferences learned from accepted/rejected edits. When set, reviewer
+uses this file without prompting. When not set, reviewer will ask for
+permission to write to \verb{~/.config/reviewer/memory.md} on first launch.
+
+Typically set in your \code{.Rprofile}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{options(reviewer.memory = "~/.config/reviewer/memory.md")
 }\if{html}{\out{</div>}}
 }
 }
