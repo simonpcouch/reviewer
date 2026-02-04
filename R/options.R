@@ -3,8 +3,8 @@
 #' @description
 #' The reviewer package makes use of the following user-facing options:
 #'
-#' * `reviewer.chat` supplies the underlying LLM powering the reviewer.
-#'   The `chat` argument to [review()] takes precedence over this option when provided.
+#' * `reviewer.client` supplies the underlying LLM powering the reviewer.
+#'   The `client` argument to [review()] takes precedence over this option when provided.
 #'   The option can be either:
 #'   - An [ellmer::Chat] object (e.g., `ellmer::chat_claude()`)
 #'   - A model string in `"provider/model"` format as described in [ellmer::chat()]
@@ -12,9 +12,9 @@
 #'
 #'   Typically set in your `.Rprofile`:
 #'   ```
-#'   options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
+#'   options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 #'   # or
-#'   options(reviewer.chat = "openai/gpt-5")
+#'   options(reviewer.client = "openai/gpt-5")
 #'   ```
 #'
 #' * `reviewer.pending_edits` controls the maximum number of pending edits
@@ -40,5 +40,5 @@
 #'   ```
 #'
 #' @name reviewer_options
-#' @aliases reviewer.chat reviewer.pending_edits reviewer.memory
+#' @aliases reviewer.client reviewer.pending_edits reviewer.memory
 NULL

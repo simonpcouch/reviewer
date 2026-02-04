@@ -9,7 +9,7 @@
 #' @param file_path Path to the R file to review.
 #' @param client The model to use for the review, specified as a
 #'   `"provider/model"` string in the same format as [ellmer::chat()].
-#'   If not provided, the `reviewer.chat` option must be set.
+#'   If not provided, the `reviewer.client` option must be set.
 #'   See [reviewer_options] for details.
 #' @param max_pending Maximum number of pending edits allowed at once before the
 #'   model waits for user responses. Higher values reduce wait time but may
@@ -23,8 +23,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Set the chat option in your .Rprofile
-#' options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
+#' # Set the client option in your .Rprofile
+#' options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 #' review("analysis.R")
 #'
 #' # Or pass the client directly

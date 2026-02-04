@@ -11,7 +11,7 @@ review(file_path, client = NULL, max_pending = NULL)
 
 \item{client}{The model to use for the review, specified as a
 \code{"provider/model"} string in the same format as \code{\link[ellmer:chat-any]{ellmer::chat()}}.
-If not provided, the \code{reviewer.chat} option must be set.
+If not provided, the \code{reviewer.client} option must be set.
 See \link{reviewer_options} for details.}
 
 \item{max_pending}{Maximum number of pending edits allowed at once before the
@@ -34,8 +34,8 @@ file immediately.
 }
 \examples{
 \dontrun{
-# Set the chat option in your .Rprofile
-options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
+# Set the client option in your .Rprofile
+options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 review("analysis.R")
 
 # Or pass the client directly

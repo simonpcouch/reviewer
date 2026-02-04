@@ -2,15 +2,15 @@
 % Please edit documentation in R/options.R
 \name{reviewer_options}
 \alias{reviewer_options}
-\alias{reviewer.chat}
+\alias{reviewer.client}
 \alias{reviewer.pending_edits}
 \alias{reviewer.memory}
 \title{Options used by the reviewer package}
 \description{
 The reviewer package makes use of the following user-facing options:
 \itemize{
-\item \code{reviewer.chat} supplies the underlying LLM powering the reviewer.
-The \code{chat} argument to \code{\link[=review]{review()}} takes precedence over this option when provided.
+\item \code{reviewer.client} supplies the underlying LLM powering the reviewer.
+The \code{client} argument to \code{\link[=review]{review()}} takes precedence over this option when provided.
 The option can be either:
 \itemize{
 \item An \link[ellmer:Chat]{ellmer::Chat} object (e.g., \code{ellmer::chat_claude()})
@@ -20,9 +20,9 @@ The option can be either:
 
 Typically set in your \code{.Rprofile}:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{options(reviewer.chat = ellmer::chat_claude(model = "claude-sonnet-4-5"))
+\if{html}{\out{<div class="sourceCode">}}\preformatted{options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 # or
-options(reviewer.chat = "openai/gpt-5")
+options(reviewer.client = "openai/gpt-5")
 }\if{html}{\out{</div>}}
 \item \code{reviewer.pending_edits} controls the maximum number of pending edits
 allowed at once before the model waits for user responses. The
