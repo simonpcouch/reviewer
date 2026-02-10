@@ -14,13 +14,9 @@ Imports:
     cli,
     coro,
     ellmer,
-    fastmap,
     htmltools,
-    later,
     promises,
-    R6,
     rlang,
-    S7,
     shiny,
     uuid
 Suggests:

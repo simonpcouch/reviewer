@@ -12,3 +12,5 @@ inst/reviewer-sc.png
 ^docs$
 ^pkgdown$
 ^\.github$
+inst/sandbox/
+plans/

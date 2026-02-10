@@ -155,7 +155,7 @@ pkg_env <- function() {
   }
 
   env <- rlang::new_environment(parent = .GlobalEnv)
-  attach(env, name = env_name, warn.conflicts = FALSE)
+  do.call("attach", list(env, name = env_name, warn.conflicts = FALSE))
   env
 }
 
