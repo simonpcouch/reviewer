@@ -382,6 +382,88 @@ check_edit_conflicts <- function(new_edit_info, file_lines) {
   NULL
 }
 
+revalidate_pending_edits <- function(accepted_edit_info, old_lines, new_lines) {
+  pending_ids <- pending_reviews()
+  if (length(pending_ids) == 0) {
+    return()
+  }
+
+  line_delta <- length(new_lines) - length(old_lines)
+
+  change_line <- NULL
+  if (isTRUE(accepted_edit_info$str_replace_mode)) {
+    old_text <- paste(old_lines, collapse = "\n")
+    match_pos <- regexpr(accepted_edit_info$old_str, old_text, fixed = TRUE)
+    if (match_pos > 0) {
+      chars_before <- substr(old_text, 1, match_pos - 1)
+      change_line <- lengths(regmatches(
+        chars_before,
+        gregexpr("\n", chars_before)
+      )) +
+        1
+    }
+  } else if (!is.null(accepted_edit_info$insert_line)) {
+    change_line <- accepted_edit_info$insert_line
+  }
+
+  new_content_text <- paste(new_lines, collapse = "\n")
+
+  for (id in pending_ids) {
+    edit_info <- the$reviews[[id]]$edit_info
+
+    if (isTRUE(edit_info$str_replace_mode)) {
+      matches <- gregexpr(
+        edit_info$old_str,
+        new_content_text,
+        fixed = TRUE
+      )[[1]]
+
+      if (length(matches) == 1 && matches[1] == -1) {
+        the$reviews[[id]]$status <- "resolved"
+        the$reviews[[id]]$response <- list(
+          approved = FALSE,
+          feedback = "Edit invalidated: the target text can no longer be found after a prior edit was accepted. Please re-propose if still needed."
+        )
+        next
+      }
+
+      if (length(matches) > 1) {
+        the$reviews[[id]]$status <- "resolved"
+        the$reviews[[id]]$response <- list(
+          approved = FALSE,
+          feedback = "Edit invalidated: the target text now matches multiple locations after a prior edit was accepted. Please re-propose with more context."
+        )
+        next
+      }
+
+      new_diff_info <- calculate_diff_info(
+        new_lines,
+        edit_info$old_str,
+        edit_info$new_str,
+        edit_info$insert_line,
+        edit_info$str_replace_mode
+      )
+      the$reviews[[id]]$edit_info$diff_lines <- new_diff_info$diff_lines
+      the$reviews[[
+        id
+      ]]$edit_info$added_lines_display <- new_diff_info$added_lines
+      the$reviews[[
+        id
+      ]]$edit_info$insert_after_line <- new_diff_info$insert_after_line
+    } else if (
+      !is.null(edit_info$insert_line) &&
+        line_delta != 0 &&
+        !is.null(change_line) &&
+        edit_info$insert_line >= change_line
+    ) {
+      new_insert_line <- edit_info$insert_line + line_delta
+      new_insert_line <- max(0L, min(new_insert_line, length(new_lines)))
+      the$reviews[[id]]$edit_info$insert_line <- new_insert_line
+      the$reviews[[id]]$edit_info$insert_after_line <- new_insert_line
+    }
+  }
+}
+
 reset_reviews <- function() {
   the$reviews <- list()
   the$propose_edit_count <- 0L

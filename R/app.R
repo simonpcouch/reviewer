@@ -230,6 +230,8 @@ review <- function(file_path, client = NULL, max_pending = NULL) {
           )
           editable_region(list(start = new_start, end = new_end))
         }
+
+        revalidate_pending_edits(edit_info, current_lines, new_lines)
       }
 
       current_lines <- shiny::isolate(file_content())
