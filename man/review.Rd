@@ -10,9 +10,10 @@ review(file_path, client = NULL, max_pending = NULL)
 \item{file_path}{Path to the R file to review.}
 
 \item{client}{The model to use for the review, either as an \link[ellmer:Chat]{ellmer::Chat}
-object a \code{"provider/model"} string in the same format acccepted by
-\code{\link[ellmer:chat-any]{ellmer::chat()}}. If not provided, the \code{reviewer.client} option must be set.
-See \link{reviewer_options} for details.}
+object or a \code{"provider/model"} string in the same format accepted by
+\code{\link[ellmer:chat-any]{ellmer::chat()}}. If not provided, the \code{reviewer.client} option will be
+consulted. See \link{reviewer_options} for details. If neither are present,
+the user will be shown an interactive dialog to select a client.}
 
 \item{max_pending}{Maximum number of pending edits allowed at once before the
 model waits for user responses. Higher values reduce wait time but may

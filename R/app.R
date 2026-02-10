@@ -8,9 +8,10 @@
 #'
 #' @param file_path Path to the R file to review.
 #' @param client The model to use for the review, either as an [ellmer::Chat]
-#'   object a `"provider/model"` string in the same format acccepted by
-#'   [ellmer::chat()]. If not provided, the `reviewer.client` option must be set.
-#'   See [reviewer_options] for details.
+#'   object or a `"provider/model"` string in the same format accepted by
+#'   [ellmer::chat()]. If not provided, the `reviewer.client` option will be
+#'   consulted. See [reviewer_options] for details. If neither are present, 
+#'   the user will be shown an interactive dialog to select a client.
 #' @param max_pending Maximum number of pending edits allowed at once before the
 #'   model waits for user responses. Higher values reduce wait time but may
 #'   feel more overwhelming. If not provided, the `reviewer.pending_edits` 
