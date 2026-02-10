@@ -30,7 +30,7 @@ test_that("new_reviewer_chat() uses model argument when option not set", {
   expect_equal(result$args$system_prompt, "test prompt")
 })
 
-test_that("new_reviewer_chat() uses string option over model argument", {
+test_that("new_reviewer_chat() uses string argument over string option", {
   withr::local_options(reviewer.client = "openai/gpt-5")
   testthat::local_mocked_bindings(
     chat = function(model, ...) {
@@ -40,7 +40,49 @@ test_that("new_reviewer_chat() uses string option over model argument", {
   )
 
   result <- new_reviewer_chat("anthropic/claude-sonnet", "test prompt")
+  expect_equal(result$model, "anthropic/claude-sonnet")
+})
+
+test_that("new_reviewer_chat() uses Chat argument over Chat option", {
+  cloned_arg <- new.env()
+  cloned_arg$system_prompt <- NULL
+  cloned_arg$set_system_prompt <- function(prompt) {
+    cloned_arg$system_prompt <<- prompt
+  }
+  arg_chat <- list(clone = function() cloned_arg)
+  class(arg_chat) <- "Chat"
+
+  cloned_opt <- new.env()
+  cloned_opt$system_prompt <- NULL
+  cloned_opt$set_system_prompt <- function(prompt) {
+    cloned_opt$system_prompt <<- prompt
+  }
+  opt_chat <- list(clone = function() cloned_opt)
+  class(opt_chat) <- "Chat"
+
+  withr::local_options(reviewer.client = opt_chat)
+
+  result <- new_reviewer_chat(arg_chat, "test prompt")
+  expect_identical(result, cloned_arg)
+  expect_equal(result$system_prompt, "test prompt")
+  expect_null(cloned_opt$system_prompt)
+})
+
+test_that("new_reviewer_chat() falls back to option when argument is NULL", {
+  withr::local_options(reviewer.client = "openai/gpt-5")
+  testthat::local_mocked_bindings(
+    chat = function(model, ...) {
+      list(model = model, args = list(...))
+    },
+    .package = "ellmer"
+  )
+
+  result <- new_reviewer_chat(NULL, "test prompt")
   expect_equal(result$model, "openai/gpt-5")
+})
+
+test_that("new_reviewer_chat() errors for invalid argument type", {
+  expect_snapshot(new_reviewer_chat(123, "system prompt"), error = TRUE)
 })
 
 test_that("new_reviewer_chat() clones Chat object and sets system prompt", {

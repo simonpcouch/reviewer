@@ -174,9 +174,36 @@ new_reviewer_chat <- function(
   system_prompt,
   call = rlang::caller_env()
 ) {
+  if (!is.null(client)) {
+    if (inherits(client, "Chat")) {
+      client <- client$clone()
+      client$set_system_prompt(system_prompt)
+      return(client)
+    }
+
+    if (is.character(client) && length(client) == 1) {
+      return(ellmer::chat(
+        client,
+        system_prompt = system_prompt,
+        echo = "output"
+      ))
+    }
+
+    cli::cli_abort(
+      c(
+        "!" = "{.arg client} must be an ellmer Chat object or
+               a model string, not {.obj_type_friendly {client}}.",
+        "i" = "Pass e.g.
+               {.code ellmer::chat_claude(\"claude-sonnet-4-5\")}
+               or {.code \"openai/gpt-5\"}."
+      ),
+      call = call
+    )
+  }
+
   client_option <- get_reviewer_client()
 
-  if (is.null(client_option) && is.null(client)) {
+  if (is.null(client_option)) {
     if (!interactive()) {
       cli::cli_abort(
         c(
@@ -188,10 +215,6 @@ new_reviewer_chat <- function(
       )
     }
     client_option <- prompt_provider_selection()
-  }
-
-  if (is.null(client_option)) {
-    return(ellmer::chat(client, system_prompt = system_prompt, echo = "output"))
   }
 
   if (inherits(client_option, "Chat")) {

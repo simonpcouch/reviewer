@@ -1,6 +1,8 @@
 Package: reviewer
 Title: Interactive LLM-Powered Tidy Code Review
 Version: 0.0.0.9000
+Author: Simon Couch [aut, cre] (ORCID: <https://orcid.org/0000-0001-5676-5107>)
+Maintainer: Simon Couch <simon.couch@posit.co>
 Authors@R:
     person("Simon", "Couch", , "simon.couch@posit.co", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-5676-5107"))

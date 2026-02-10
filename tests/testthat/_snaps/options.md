@@ -8,6 +8,15 @@
       i Set `options(reviewer.client = ellmer::chat_*())` to continue.
       i See `?reviewer::review()` for more information.
 
+# new_reviewer_chat() errors for invalid argument type
+
+    Code
+      new_reviewer_chat(123, "system prompt")
+    Condition
+      Error:
+      ! `client` must be an ellmer Chat object or a model string, not a number.
+      i Pass e.g. `ellmer::chat_claude("claude-sonnet-4-5")` or `"openai/gpt-5"`.
+
 # new_reviewer_chat() errors for invalid option type
 
     Code
