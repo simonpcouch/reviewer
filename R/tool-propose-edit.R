@@ -13,23 +13,23 @@ tool_propose_edit <- function(max_pending = NULL) {
       "Use old_str + new_str for replacements, or insert_line + new_str for insertions."
     ),
     arguments = list(
-      `_intent` = ellmer::type_string(
-        "A plain-english, 3-6 word description of the change you're about to propose."
-      ),
-      justification = ellmer::type_string(
-        "Your argument for why this change improves the code (2 sentences max). This is shown to the user."
-      ),
-      insert_line = ellmer::type_number(
-        "For INSERT mode: Line number after which to insert new_str (0 = beginning of file)",
+      old_str = ellmer::type_string(
+        "For REPLACE mode: The exact text to find and replace. Must match exactly including whitespace.",
         required = FALSE
       ),
       new_str = ellmer::type_string(
         "The new text to insert or use as replacement. If omitted, only shift is applied.",
         required = FALSE
       ),
-      old_str = ellmer::type_string(
-        "For REPLACE mode: The exact text to find and replace. Must match exactly including whitespace.",
+      insert_line = ellmer::type_number(
+        "For INSERT mode: Line number after which to insert new_str (0 = beginning of file)",
         required = FALSE
+      ),
+      `_intent` = ellmer::type_string(
+        "A plain-english, 3-6 word description of the change you've proposed."
+      ),
+      justification = ellmer::type_string(
+        "Your argument for why this change improves the code (2 sentences max). This is shown to the user."
       ),
       shift = ellmer::type_number(
         "Number of lines to shift the editable region forward after this edit (default 0)",
