@@ -10,11 +10,11 @@
 #' @param client The model to use for the review, either as an [ellmer::Chat]
 #'   object or a `"provider/model"` string in the same format accepted by
 #'   [ellmer::chat()]. If not provided, the `reviewer.client` option will be
-#'   consulted. See [reviewer_options] for details. If neither are present, 
+#'   consulted. See [reviewer_options] for details. If neither are present,
 #'   the user will be shown an interactive dialog to select a client.
 #' @param max_pending Maximum number of pending edits allowed at once before the
 #'   model waits for user responses. Higher values reduce wait time but may
-#'   feel more overwhelming. If not provided, the `reviewer.pending_edits` 
+#'   feel more overwhelming. If not provided, the `reviewer.pending_edits`
 #'   option is used. Defaults to 2.
 #'
 #' @returns The function's main purpose is its side-effect, a Docs-style
@@ -333,9 +333,15 @@ format_file_for_llm <- function(
 ) {
   output <- character()
 
-  n_lines <- min(length(lines), visible_lines)
+  window_start <- max(1L, editable_start - 10L)
+  window_end <- min(length(lines), window_start + visible_lines - 1L)
+  editable_end <- min(editable_end, length(lines))
 
-  for (i in seq_len(n_lines)) {
+  if (window_start > 1) {
+    output <- c(output, sprintf("... (%d lines above)", window_start - 1L))
+  }
+
+  for (i in window_start:window_end) {
     if (i == editable_start) {
       output <- c(output, "{editable_region}")
     }
@@ -348,10 +354,10 @@ format_file_for_llm <- function(
     }
   }
 
-  if (visible_lines < length(lines)) {
+  if (window_end < length(lines)) {
     output <- c(
       output,
-      sprintf("... (%d more lines)", length(lines) - visible_lines)
+      sprintf("... (%d more lines)", length(lines) - window_end)
     )
   }
 
