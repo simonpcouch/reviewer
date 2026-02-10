@@ -272,6 +272,16 @@ review <- function(file_path, client = NULL, max_pending = NULL) {
       }
     })
 
+    shiny::observeEvent(feedback_pending(), {
+      if (
+        feedback_pending() &&
+          stream_task$status() %in% c("success", "error")
+      ) {
+        feedback_pending(FALSE)
+        start_feedback_turn()
+      }
+    })
+
     shiny::observeEvent(TRUE, once = TRUE, {
       reviewing_started(TRUE)
 
