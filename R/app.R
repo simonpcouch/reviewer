@@ -211,9 +211,7 @@ review <- function(file_path, client = NULL, max_pending = NULL) {
         new_lines <- apply_edit_to_lines(
           current_lines,
           edit_info$old_str,
-          edit_info$new_str,
-          edit_info$insert_line,
-          edit_info$str_replace_mode
+          edit_info$new_str
         )
         file_content(new_lines)
         writeLines(new_lines, file_path)
@@ -358,8 +356,7 @@ format_file_for_llm <- function(
       output <- c(output, "{editable_region}")
     }
 
-    line_text <- sprintf("%d: %s", i, lines[i])
-    output <- c(output, line_text)
+    output <- c(output, lines[i])
 
     if (i == editable_end) {
       output <- c(output, "{/editable_region}")

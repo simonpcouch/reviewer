@@ -4,25 +4,21 @@ tool_propose_edit <- function(max_pending = NULL) {
     name = "propose_edit",
     description = paste(
       "Propose an edit to the code file being reviewed.",
-      "You can either propose a text replacement/insertion, or simply shift the editable region.",
+      "You can either propose a text replacement, or simply shift the editable region.",
       "",
-      "If you provide new_str, the edit will be shown to the user who must Accept or Reject it.",
+      "If you provide old_str + new_str, the edit will be shown to the user who must Accept or Reject it.",
       "If you only provide shift (without new_str), the editable region will move forward silently.",
       "",
       "The edit must be within the current editable region.",
-      "Use old_str + new_str for replacements, or insert_line + new_str for insertions."
+      "old_str must match the file content exactly, including whitespace."
     ),
     arguments = list(
       old_str = ellmer::type_string(
-        "For REPLACE mode: The exact text to find and replace. Must match exactly including whitespace.",
+        "The exact text to find and replace. Must match exactly including whitespace.",
         required = FALSE
       ),
       new_str = ellmer::type_string(
-        "The new text to insert or use as replacement. If omitted, only shift is applied.",
-        required = FALSE
-      ),
-      insert_line = ellmer::type_number(
-        "For INSERT mode: Line number after which to insert new_str (0 = beginning of file)",
+        "The replacement text. If omitted, only shift is applied.",
         required = FALSE
       ),
       `_intent` = ellmer::type_string(
@@ -45,7 +41,6 @@ make_propose_edit_impl <- function(max_pending = NULL) {
   coro::async(function(
     `_intent` = NULL,
     justification = NULL,
-    insert_line = NULL,
     new_str = NULL,
     old_str = NULL,
     shift = 0
@@ -92,71 +87,46 @@ make_propose_edit_impl <- function(max_pending = NULL) {
       }
     }
 
-    str_replace_mode <- !is.null(old_str) && !is.null(new_str)
-    insert_mode <- !is.null(insert_line) && !is.null(new_str)
-
-    if (str_replace_mode && insert_mode) {
+    if (is.null(old_str)) {
       return(ellmer::ContentToolResult(
-        value = "Error: Cannot use both str_replace mode (old_str/new_str) and insert mode (insert_line/new_str) at the same time.",
-        error = "Invalid mode combination"
-      ))
-    }
-
-    if (!str_replace_mode && !insert_mode) {
-      return(ellmer::ContentToolResult(
-        value = "Error: Must provide either (old_str + new_str) for replacement or (insert_line + new_str) for insertion.",
+        value = "Error: old_str is required when new_str is provided.",
         error = "Missing required arguments"
       ))
     }
 
-    if (str_replace_mode) {
-      if (old_str == new_str) {
-        return(ellmer::ContentToolResult(
-          value = "Error: old_str and new_str are identical. No changes to make.",
-          error = "old_str and new_str are identical."
-        ))
-      }
-
-      old_content_text <- paste(current_lines, collapse = "\n")
-      matches <- gregexpr(old_str, old_content_text, fixed = TRUE)[[1]]
-
-      if (length(matches) == 1 && matches[1] == -1) {
-        return(ellmer::ContentToolResult(
-          value = sprintf(
-            "Error: No match found for old_str. Make sure the text matches exactly, including whitespace. old_str was: %s",
-            substr(old_str, 1, 100)
-          ),
-          error = "No match found"
-        ))
-      }
-
-      if (length(matches) > 1) {
-        return(ellmer::ContentToolResult(
-          value = sprintf(
-            "Error: Found %d matches for old_str. Please provide more context to make the match unique.",
-            length(matches)
-          ),
-          error = "Multiple matches"
-        ))
-      }
+    if (old_str == new_str) {
+      return(ellmer::ContentToolResult(
+        value = "Error: old_str and new_str are identical. No changes to make.",
+        error = "old_str and new_str are identical."
+      ))
     }
 
-    if (insert_mode) {
-      if (insert_line < 0 || insert_line > length(current_lines)) {
-        return(ellmer::ContentToolResult(
-          value = sprintf(
-            "Error: insert_line must be between 0 and %d.",
-            length(current_lines)
-          ),
-          error = "Invalid insert_line"
-        ))
-      }
+    old_content_text <- paste(current_lines, collapse = "\n")
+    matches <- gregexpr(old_str, old_content_text, fixed = TRUE)[[1]]
+
+    if (length(matches) == 1 && matches[1] == -1) {
+      return(ellmer::ContentToolResult(
+        value = sprintf(
+          "Error: No match found for old_str. Make sure the text matches exactly, including whitespace. old_str was: %s",
+          substr(old_str, 1, 100)
+        ),
+        error = "No match found"
+      ))
+    }
+
+    if (length(matches) > 1) {
+      return(ellmer::ContentToolResult(
+        value = sprintf(
+          "Error: Found %d matches for old_str. Please provide more context to make the match unique.",
+          length(matches)
+        ),
+        error = "Multiple matches"
+      ))
     }
 
     proposed_edit_info <- list(
       old_str = old_str,
-      insert_line = insert_line,
-      str_replace_mode = str_replace_mode
+      str_replace_mode = TRUE
     )
     conflict <- check_edit_conflicts(proposed_edit_info, current_lines)
     if (!is.null(conflict)) {
@@ -171,9 +141,7 @@ make_propose_edit_impl <- function(max_pending = NULL) {
     diff_info <- calculate_diff_info(
       current_lines,
       old_str,
-      new_str,
-      insert_line,
-      str_replace_mode
+      new_str
     )
 
     request_id <- uuid::UUIDgenerate()
@@ -184,9 +152,8 @@ make_propose_edit_impl <- function(max_pending = NULL) {
       justification = justification %||% "",
       old_str = old_str,
       new_str = new_str,
-      insert_line = insert_line,
       shift = shift,
-      str_replace_mode = str_replace_mode,
+      str_replace_mode = TRUE,
       diff_lines = diff_info$diff_lines,
       added_lines_display = diff_info$added_lines,
       insert_after_line = diff_info$insert_after_line
@@ -224,58 +191,46 @@ make_propose_edit_impl <- function(max_pending = NULL) {
   })
 }
 
-calculate_diff_info <- function(
-  lines,
-  old_str,
-  new_str,
-  insert_line,
-  str_replace_mode
-) {
+calculate_diff_info <- function(lines, old_str, new_str) {
   diff_lines <- list()
   added_lines <- NULL
   insert_after_line <- NULL
 
-  if (str_replace_mode) {
-    old_content_text <- paste(lines, collapse = "\n")
-    match_pos <- regexpr(old_str, old_content_text, fixed = TRUE)
+  old_content_text <- paste(lines, collapse = "\n")
+  match_pos <- regexpr(old_str, old_content_text, fixed = TRUE)
 
-    if (match_pos > 0) {
-      chars_before <- substr(old_content_text, 1, match_pos - 1)
-      newlines_before <- lengths(regmatches(
-        chars_before,
-        gregexpr("\n", chars_before)
-      ))
-      start_line <- newlines_before + 1
+  if (match_pos > 0) {
+    chars_before <- substr(old_content_text, 1, match_pos - 1)
+    newlines_before <- lengths(regmatches(
+      chars_before,
+      gregexpr("\n", chars_before)
+    ))
+    start_line <- newlines_before + 1
 
-      old_str_trimmed <- sub("\n$", "", old_str)
-      old_str_lines <- strsplit(old_str_trimmed, "\n", fixed = TRUE)[[1]]
-      if (length(old_str_lines) == 0) {
-        old_str_lines <- ""
-      }
-      n_old_lines <- length(old_str_lines)
-      end_line <- start_line + n_old_lines - 1
-
-      new_str_trimmed <- sub("\n$", "", new_str)
-      new_str_lines <- strsplit(new_str_trimmed, "\n", fixed = TRUE)[[1]]
-      if (length(new_str_lines) == 0) {
-        new_str_lines <- ""
-      }
-
-      diff_result <- match_lines_by_similarity(
-        old_str_lines,
-        new_str_lines,
-        start_line
-      )
-      diff_lines <- diff_result$diff_lines
-      added_lines <- diff_result$added_lines
-      if (length(added_lines) > 0) {
-        insert_after_line <- end_line
-      }
+    old_str_trimmed <- sub("\n$", "", old_str)
+    old_str_lines <- strsplit(old_str_trimmed, "\n", fixed = TRUE)[[1]]
+    if (length(old_str_lines) == 0) {
+      old_str_lines <- ""
     }
-  } else {
-    new_str_lines <- strsplit(new_str, "\n", fixed = TRUE)[[1]]
-    added_lines <- new_str_lines
-    insert_after_line <- insert_line
+    n_old_lines <- length(old_str_lines)
+    end_line <- start_line + n_old_lines - 1
+
+    new_str_trimmed <- sub("\n$", "", new_str)
+    new_str_lines <- strsplit(new_str_trimmed, "\n", fixed = TRUE)[[1]]
+    if (length(new_str_lines) == 0) {
+      new_str_lines <- ""
+    }
+
+    diff_result <- match_lines_by_similarity(
+      old_str_lines,
+      new_str_lines,
+      start_line
+    )
+    diff_lines <- diff_result$diff_lines
+    added_lines <- diff_result$added_lines
+    if (length(added_lines) > 0) {
+      insert_after_line <- end_line
+    }
   }
 
   list(
@@ -417,28 +372,8 @@ line_similarity <- function(a, b) {
   common_len / min(length(a_chars), length(b_chars))
 }
 
-apply_edit_to_lines <- function(
-  lines,
-  old_str,
-  new_str,
-  insert_line,
-  str_replace_mode
-) {
-  if (str_replace_mode) {
-    old_content_text <- paste(lines, collapse = "\n")
-    new_content_text <- sub(old_str, new_str, old_content_text, fixed = TRUE)
-    strsplit(new_content_text, "\n", fixed = TRUE)[[1]]
-  } else {
-    # Insert mode
-    new_str_lines <- strsplit(new_str, "\n", fixed = TRUE)[[1]]
-    c(
-      if (insert_line > 0) lines[1:insert_line] else character(0),
-      new_str_lines,
-      if (insert_line < length(lines)) {
-        lines[(insert_line + 1):length(lines)]
-      } else {
-        character(0)
-      }
-    )
-  }
+apply_edit_to_lines <- function(lines, old_str, new_str) {
+  old_content_text <- paste(lines, collapse = "\n")
+  new_content_text <- sub(old_str, new_str, old_content_text, fixed = TRUE)
+  strsplit(new_content_text, "\n", fixed = TRUE)[[1]]
 }

@@ -310,8 +310,6 @@ sort_reviews_by_position <- function(reviews, file_lines) {
         } else {
           Inf
         }
-      } else if (!is.null(edit_info$insert_line)) {
-        edit_info$insert_line
       } else {
         Inf
       }
@@ -330,14 +328,6 @@ get_edit_range <- function(edit_info, file_text) {
       end_char <- start_char + nchar(edit_info$old_str) - 1L
       return(list(start = start_char, end = end_char))
     }
-  } else if (!is.null(edit_info$insert_line)) {
-    if (edit_info$insert_line == 0) {
-      return(list(start = 0L, end = 0L))
-    }
-    lines <- strsplit(file_text, "\n", fixed = TRUE)[[1]]
-    char_pos <- sum(nchar(lines[seq_len(edit_info$insert_line)])) +
-      edit_info$insert_line
-    return(list(start = char_pos, end = char_pos))
   }
   NULL
 }
@@ -402,8 +392,6 @@ revalidate_pending_edits <- function(accepted_edit_info, old_lines, new_lines) {
       )) +
         1
     }
-  } else if (!is.null(accepted_edit_info$insert_line)) {
-    change_line <- accepted_edit_info$insert_line
   }
 
   new_content_text <- paste(new_lines, collapse = "\n")
@@ -439,9 +427,7 @@ revalidate_pending_edits <- function(accepted_edit_info, old_lines, new_lines) {
       new_diff_info <- calculate_diff_info(
         new_lines,
         edit_info$old_str,
-        edit_info$new_str,
-        edit_info$insert_line,
-        edit_info$str_replace_mode
+        edit_info$new_str
       )
       the$reviews[[id]]$edit_info$diff_lines <- new_diff_info$diff_lines
       the$reviews[[
@@ -450,16 +436,6 @@ revalidate_pending_edits <- function(accepted_edit_info, old_lines, new_lines) {
       the$reviews[[
         id
       ]]$edit_info$insert_after_line <- new_diff_info$insert_after_line
-    } else if (
-      !is.null(edit_info$insert_line) &&
-        line_delta != 0 &&
-        !is.null(change_line) &&
-        edit_info$insert_line >= change_line
-    ) {
-      new_insert_line <- edit_info$insert_line + line_delta
-      new_insert_line <- max(0L, min(new_insert_line, length(new_lines)))
-      the$reviews[[id]]$edit_info$insert_line <- new_insert_line
-      the$reviews[[id]]$edit_info$insert_after_line <- new_insert_line
     }
   }
 }
