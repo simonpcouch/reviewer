@@ -14,7 +14,7 @@ tool_propose_edit <- function(max_pending = NULL) {
     ),
     arguments = list(
       `_intent` = ellmer::type_string(
-        "A short description of the change, e.g. 'Adding spaces around equals signs'"
+        "A plain-english, 3-6 word description of the change you're about to propose."
       ),
       justification = ellmer::type_string(
         "Your argument for why this change improves the code (2 sentences max). This is shown to the user."
