@@ -20,8 +20,9 @@ review(file_path, client = NULL, max_pending = NULL)
 
 - client:
 
-  The model to use for the review, specified as a `"provider/model"`
-  string in the same format as
+  The model to use for the review, either as an
+  [ellmer::Chat](https://ellmer.tidyverse.org/reference/Chat.html)
+  object a `"provider/model"` string in the same format acccepted by
   [`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html).
   If not provided, the `reviewer.client` option must be set. See
   [reviewer_options](https://simonpcouch.github.io/reviewer/reference/reviewer_options.md)
@@ -31,8 +32,8 @@ review(file_path, client = NULL, max_pending = NULL)
 
   Maximum number of pending edits allowed at once before the model waits
   for user responses. Higher values reduce wait time but may feel more
-  overwhelming and risk edit conflicts. If not provided, the
-  `reviewer.pending_edits` option is used. Defaults to 2.
+  overwhelming. If not provided, the `reviewer.pending_edits` option is
+  used. Defaults to 2.
 
 ## Value
 
@@ -47,11 +48,12 @@ after review.
 
 ``` r
 if (FALSE) { # \dontrun{
-# Set the client option in your .Rprofile
+# Set the client option (possibly in your .Rprofile)
 options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 review("analysis.R")
 
 # Or pass the client directly
 review("script.R", client = "openai/gpt-5")
+review("script.R", client = ellmer::chat_openai(model = "gpt-5"))
 } # }
 ```
