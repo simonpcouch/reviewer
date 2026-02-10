@@ -7,14 +7,14 @@
 #' file immediately.
 #'
 #' @param file_path Path to the R file to review.
-#' @param client The model to use for the review, specified as a
-#'   `"provider/model"` string in the same format as [ellmer::chat()].
-#'   If not provided, the `reviewer.client` option must be set.
+#' @param client The model to use for the review, either as an [ellmer::Chat]
+#'   object a `"provider/model"` string in the same format acccepted by
+#'   [ellmer::chat()]. If not provided, the `reviewer.client` option must be set.
 #'   See [reviewer_options] for details.
 #' @param max_pending Maximum number of pending edits allowed at once before the
 #'   model waits for user responses. Higher values reduce wait time but may
-#'   feel more overwhelming and risk edit conflicts. If not provided, the
-#'   `reviewer.pending_edits` option is used. Defaults to 2.
+#'   feel more overwhelming. If not provided, the `reviewer.pending_edits` 
+#'   option is used. Defaults to 2.
 #'
 #' @returns The function's main purpose is its side-effect, a Docs-style
 #' interface opened in the browser. On app close, the [ellmer::Chat] object
@@ -23,12 +23,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Set the client option in your .Rprofile
+#' # Set the client option (possibly in your .Rprofile)
 #' options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
 #' review("analysis.R")
 #'
 #' # Or pass the client directly
 #' review("script.R", client = "openai/gpt-5")
+#' review("script.R", client = ellmer::chat_openai(model = "gpt-5"))
 #' }
 #'
 #' @export
