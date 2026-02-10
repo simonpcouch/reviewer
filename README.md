@@ -19,18 +19,6 @@ Install reviewer from GitHub with:
 pak::pak("simonpcouch/reviewer")
 ```
 
-## Authentication
-
-You can use any model provider supported by
-[ellmer](https://ellmer.tidyverse.org/).
-
-If you’re connecting to a model provider by API key, add your API key to
-your `.Renviron`.
-
-See the ellmer
-[authentication](https://ellmer.tidyverse.org/#authentication)
-documentation for more details.
-
 ## Usage
 
 To review an R script:
@@ -43,11 +31,11 @@ review("path/to/your/script.R")
 This opens a Shiny app where you can accept or reject the suggested
 improvements to your code.
 
-By default, `review()` uses Claude Sonnet 4.5. To change models, provide
-a `provider/model` string in the same manner you would to
-[`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html)
-to the `model` argument:
+If you haven’t yet configured a client to use with reviewer, `review()`
+will present you with an interactive menu of possible models to use
+based on the environment variables you have available. You can use any
+model provider supported by [ellmer](https://ellmer.tidyverse.org/).
 
-``` r
-review("path/to/your/script.R", model = "openai/gpt-5")
-```
+I’ve had good experiences with using Claude Sonnet 4.5 as a client. To
+change models, set the `review(client)` argument or the
+`reviewer.client` option to an ellmer chat.
