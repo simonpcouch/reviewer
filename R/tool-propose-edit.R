@@ -442,6 +442,3 @@ apply_edit_to_lines <- function(
     )
   }
 }
-
-# Use rlang's null-coalescing operator
-`%||%` <- rlang::`%||%`
