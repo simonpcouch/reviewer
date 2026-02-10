@@ -366,7 +366,7 @@ match_lines_by_similarity <- function(old_lines, new_lines, start_line) {
 
   for (m in matches) {
     file_line <- start_line + m$old_idx - 1
-    if (m$sim < 1.0) {
+    if (old_lines[m$old_idx] != new_lines[m$new_idx]) {
       diff_lines[[as.character(file_line)]] <- list(
         type = "changed",
         old_content = old_lines[m$old_idx],
