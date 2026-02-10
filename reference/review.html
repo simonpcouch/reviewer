@@ -62,9 +62,10 @@ file immediately.</p>
 
 <dt id="arg-client">client<a class="anchor" aria-label="anchor" href="#arg-client"></a></dt>
 <dd><p>The model to use for the review, either as an <a href="https://ellmer.tidyverse.org/reference/Chat.html" class="external-link">ellmer::Chat</a>
-object a <code>"provider/model"</code> string in the same format acccepted by
-<code><a href="https://ellmer.tidyverse.org/reference/chat-any.html" class="external-link">ellmer::chat()</a></code>. If not provided, the <code>reviewer.client</code> option must be set.
-See <a href="reviewer_options.html">reviewer_options</a> for details.</p></dd>
+object or a <code>"provider/model"</code> string in the same format accepted by
+<code><a href="https://ellmer.tidyverse.org/reference/chat-any.html" class="external-link">ellmer::chat()</a></code>. If not provided, the <code>reviewer.client</code> option will be
+consulted. See <a href="reviewer_options.html">reviewer_options</a> for details. If neither are present,
+the user will be shown an interactive dialog to select a client.</p></dd>
 
 
 <dt id="arg-max-pending">max_pending<a class="anchor" aria-label="anchor" href="#arg-max-pending"></a></dt>

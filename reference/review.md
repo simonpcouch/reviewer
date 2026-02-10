@@ -22,11 +22,12 @@ review(file_path, client = NULL, max_pending = NULL)
 
   The model to use for the review, either as an
   [ellmer::Chat](https://ellmer.tidyverse.org/reference/Chat.html)
-  object a `"provider/model"` string in the same format acccepted by
+  object or a `"provider/model"` string in the same format accepted by
   [`ellmer::chat()`](https://ellmer.tidyverse.org/reference/chat-any.html).
-  If not provided, the `reviewer.client` option must be set. See
+  If not provided, the `reviewer.client` option will be consulted. See
   [reviewer_options](https://simonpcouch.github.io/reviewer/reference/reviewer_options.md)
-  for details.
+  for details. If neither are present, the user will be shown an
+  interactive dialog to select a client.
 
 - max_pending:
 
