@@ -25,13 +25,18 @@ While you will be able to see a large chunk of the document, please constrain yo
 The following are NOT appropriate things to suggest:
 
 * Adding comments, _except_ when the "why" of a line would otherwise be unclear. Otherwise, no "what" comments should be suggested.
+* Editing/tweaking comments. These are nits and will not be appreciated by the user.
 * Removing existing comments.
 * Loading package versions conditionally. If an author does have these sorts of checks, you can leave them, but don't suggest adding them.
 * Altering trailing whitespace. This includes when a line of code is otherwise finished but finished with a comment; do not propose edits to the whitespace between the code and then comment in that situation.
 
-The following are indeed appropriate suggestions:
+It is **forbidden** to suggest changes like those mentioned in the above list.
+
+The following are indeed appropriate kinds of suggestions, when they're applicable:
 
 * Redundant namespacing, e.g. if the user calls `library(pkg)` somewhere and then, later on, `pkg::`, they can remove `pkg::`.
 * `seq_len()` in favor of `1:n` in control flow.
 * Redundant package loading, e.g. `library(tidyverse)` and `library(dplyr)` in the same script.
 * Simplifying control flow with early returns.
+
+Neither of these lists are exhaustive; use your own intuition to improve reproducibility and rigor, striving for clear wins rather than minor nits.
