@@ -42,6 +42,6 @@ will present you with an interactive menu of possible models to use
 based on the environment variables you have available. You can use any
 model provider supported by [ellmer](https://ellmer.tidyverse.org/).
 
-I’ve had good experiences with using Claude Sonnet 4.5 as a client. To
-change models, set the `review(client)` argument or the
-`reviewer.client` option to an ellmer chat.
+I’ve had good experiences with using GPT-5.2 as a client. To change
+models, set the `review(client)` argument or the `reviewer.client`
+option to an ellmer chat.
