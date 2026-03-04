@@ -15,7 +15,7 @@
     Condition
       Error:
       ! `client` must be an ellmer Chat object or a model string, not a number.
-      i Pass e.g. `ellmer::chat_claude("claude-sonnet-4-5")` or `"openai/gpt-5"`.
+      i Pass e.g. `ellmer::chat_openai(model = "gpt-5.2")` or `"openai/gpt-5.2"`.
 
 # new_reviewer_chat() errors for invalid option type
 
@@ -24,7 +24,7 @@
     Condition
       Error:
       ! The option `reviewer.client` must be an ellmer Chat object or a model string, not a number.
-      i Set e.g. `options(reviewer.client = ellmer::chat_claude("claude-sonnet-4-5"))` or `options(reviewer.client = "openai/gpt-5")` in your '~/.Rprofile'.
+      i Set e.g. `options(reviewer.client = ellmer::chat_openai(model = "gpt-5.2"))` or `options(reviewer.client = "openai/gpt-5.2")` in your '~/.Rprofile'.
 
 # new_reviewer_chat() errors for non-scalar string option
 
@@ -33,7 +33,7 @@
     Condition
       Error:
       ! The option `reviewer.client` must be an ellmer Chat object or a model string, not a character vector.
-      i Set e.g. `options(reviewer.client = ellmer::chat_claude("claude-sonnet-4-5"))` or `options(reviewer.client = "openai/gpt-5")` in your '~/.Rprofile'.
+      i Set e.g. `options(reviewer.client = ellmer::chat_openai(model = "gpt-5.2"))` or `options(reviewer.client = "openai/gpt-5.2")` in your '~/.Rprofile'.
 
 # get_reviewer_pending_edits() errors for non-numeric option
 

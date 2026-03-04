@@ -36,12 +36,12 @@ file immediately.
 \examples{
 \dontrun{
 # Set the client option (possibly in your .Rprofile)
-options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
+options(reviewer.client = ellmer::chat_openai(model = "gpt-5.2"))
 review("analysis.R")
 
 # Or pass the client directly
-review("script.R", client = "openai/gpt-5")
-review("script.R", client = ellmer::chat_openai(model = "gpt-5"))
+review("script.R", client = "openai/gpt-5.2")
+review("script.R", client = ellmer::chat_openai(model = "gpt-5.2"))
 }
 
 }

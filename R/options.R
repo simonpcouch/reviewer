@@ -8,11 +8,11 @@
 #'   The option can be either:
 #'   - An [ellmer::Chat] object (e.g., `ellmer::chat_claude()`)
 #'   - A model string in `"provider/model"` format as described in [ellmer::chat()]
-#'     (e.g., `"anthropic/claude-sonnet-4-5"`)
+#'     (e.g., `"openai/gpt-5.2"`)
 #'
 #'   Typically set in your `.Rprofile`:
 #'   ```
-#'   options(reviewer.client = ellmer::chat_claude(model = "claude-sonnet-4-5"))
+#'   options(reviewer.client = ellmer::chat_openai(model = "gpt-5.2"))
 #'   # or
 #'   options(reviewer.client = "openai/gpt-5")
 #'   ```

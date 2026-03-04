@@ -17,11 +17,11 @@ provider_available <- function(chat_fn) {
 prompt_provider_selection <- function() {
   providers <- list(
     list(
-      name = "Anthropic (Claude Sonnet 4.5)",
+      name = "Anthropic (Claude Opus 4.6)",
       fn_name = "chat_anthropic",
-      model = "claude-sonnet-4-5",
+      model = "claude-opus-4-6",
       create_client = function() {
-        ellmer::chat_anthropic(model = "claude-sonnet-4-5")
+        ellmer::chat_anthropic(model = "claude-opus-4-6")
       }
     ),
     list(
@@ -194,8 +194,8 @@ new_reviewer_chat <- function(
         "!" = "{.arg client} must be an ellmer Chat object or
                a model string, not {.obj_type_friendly {client}}.",
         "i" = "Pass e.g.
-               {.code ellmer::chat_claude(\"claude-sonnet-4-5\")}
-               or {.code \"openai/gpt-5\"}."
+               {.code ellmer::chat_openai(model = \"gpt-5.2\")}
+               or {.code \"openai/gpt-5.2\"}."
       ),
       call = call
     )
@@ -236,8 +236,8 @@ new_reviewer_chat <- function(
       "!" = "The option {.code reviewer.client} must be an ellmer Chat object or
              a model string, not {.obj_type_friendly {client_option}}.",
       "i" = "Set e.g.
-             {.code options(reviewer.client = ellmer::chat_claude(\"claude-sonnet-4-5\"))}
-             or {.code options(reviewer.client = \"openai/gpt-5\")}
+             {.code options(reviewer.client = ellmer::chat_openai(model = \"gpt-5.2\"))}
+             or {.code options(reviewer.client = \"openai/gpt-5.2\")}
              in your {.file ~/.Rprofile}."
     ),
     call = call
